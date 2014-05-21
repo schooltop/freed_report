@@ -21,12 +21,17 @@ a report_chart tool
 创建一个数据库表，部分字段如下：（举例：AC图表的4个粒度的图型配置。）
 
 area_gran	time_gran	action_title	chart_style_id	chart_atrributes	chart_sql	parent
+
 地域粒度	时间力度	连接名称	图表类型	图表属性	图表数据集	父节点
-province	day	province_day_ac	1	该图表的配置属性	SQL脚本	
-province	month	province_month_ac	1	---	---	
-city
-day	city_day_ac	1	---	---	
-city	month	city_month_ac	1	---	---	
+
+province	day	province_day_ac	1	该图表的配置属性	SQL脚本
+
+province	month	province_month_ac	1	---	---
+
+city        day	city_day_ac	1	---	---	
+
+city	month	city_month_ac	1	---	---
+
 现在假设有一个名称为AC的柱状图的图表需要展示：
 
 由于该图表有省天、省月、地市天、地市月等粒度的切换需求所以，设置了地域粒度（area_gran）、时间粒度（time_gran）字段。
