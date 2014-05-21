@@ -1,0 +1,213 @@
+<script language="javascript" type="text/javascript">
+  <!--
+  function setTab(name,cursel,n){
+    var area=""
+    for(i=1;i<=n;i++){
+      if(i=="1"){
+        area="province"
+      }else{
+        area="city"
+      }
+      var menu=document.getElementById(name+i);
+      var con=document.getElementById("con_"+name+"_"+area);
+      var con_size=document.getElementById("con_"+name+"_"+"size");
+      if(con_size){
+        if(cursel=="2"){
+          if(con_size.value=="0"){
+            changechar(name)
+            con_size.value=Number(con_size.value)+1;
+          }
+        }
+      }
+      menu.className=i==cursel?"hover":"";
+      con.style.display=i==cursel?"block":"none";
+    }
+  }
+  //-->
+
+  //function changechar(name){
+  // var month_time=document.getElementsByName("begin_time")[0].value
+  //new Ajax.Updater("#con_"+name+"_city", "/first_pages/area_gran_check?time_gran="+"month"+"&begin_time="+month_time+"&area_gran="+"city"+"&kpi_style="+name
+  //); }
+
+
+
+  function changechar(name){
+    time_gran=$("#time_gran").val()
+    var month_time=document.getElementsByName("begin_time")[0].value
+    $.ajax({
+      type: "post",
+      url:  "/first_pages/area_gran_check?time_gran="+time_gran+"&begin_time="+month_time+"&area_gran="+"city"+"&kpi_style="+name,
+      dataType:"text",
+      success: function(msg){
+        $("#con_"+name+"_city").empty();
+        $("#con_"+name+"_city").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+  }
+  //
+  function changedate(){
+    time_gran=$("#time_gran").val()
+    //alert(time_gran);
+    $.ajax({
+      type: "POST",
+      url:  "/ult_user_analyses/check_dategran?time_gran="+time_gran,
+      dataType:"text",
+      success: function(msg){
+<%#*alert(msg);%>
+        $("#date_gran").empty();
+        $("#date_gran").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+  }
+$(document).ready(  function(){});
+function hiden(){
+$("#divObj").hide();//hide()函数,实现隐藏,括号里还可以带一个时间参数(毫秒)例如hide(2000)以2000毫秒的速度隐藏,还可以带slow,fast
+}
+function slideToggle(){
+$("#divObj").slideToggle();//窗帘效果的切换,点一下收,点一下开,参数可以无,参数说明同上
+}
+function show(){
+$("#divObj").show();//显示,参数说明同上
+}
+function toggle(){
+$("#divObj").toggle();//显示隐藏切换,参数可以无,参数说明同上
+
+}
+function slide(){
+$("#divObj").slideDown();//窗帘效果展开
+}
+
+  function checktime(){
+    var begin_time=$("#begin_time").val();
+<%#*alert(begin_time);%>
+    if(begin_time==""){
+      alert ("请选择时间!");
+      return false;
+    }
+  }
+</script>
+
+<div class="index_wrap">
+  <% form_tag(url_for(:controller=>"first_pages")) do%>
+    <div class="time_title" onclick="slideToggle()">高级搜索&nbsp;&nbsp;<%#=image_tag('/images/time_title.png')%>
+    </div>
+    <ul id="divObj" class="time_block" style="display:none">
+      <li><%= label_tag :time_gran,"时间粒度：" %>
+        <%= select :time_gran,"",[["月","month"],["日","day"]],{:include_blank =>false,:selected=>params[:time_gran]},:class => "select_01",:id=>"time_gran",:onchange=>"changedate()"%>
+      </li>
+      <li style="margin-left:30px;" id="date_gran">
+        <%if params[:time_gran]&&params[:time_gran]=="day"%>
+          <%=render :partial=>"common_components/time_date"%>
+        <%elsif params[:time_gran]&&params[:time_gran]=="month"%>
+          <%=render :partial=>"common_components/time_month"%>
+        <%end%>
+      </li>
+      <li style="margin-left:10px;">
+        <%= submit_tag "",:id=>"submit_conditions",:name => nil ,:class =>"button_01",:onclick =>"return checktime();"%>&nbsp;
+      </li>
+    </ul>
+  <%end%>
+  <%=javascript_include_tag "FusionCharts.js"%>
+  <div class="index_main">
+    <div class="index_title"><img src="images/first_page/index_icon.png" />&nbsp;&nbsp;用户概况</div>
+    <p><%@user_userdetails=instance_variable_get("@province_#{params[:time_gran]}_user_userdetail")%>
+       <%if @user_userdetails&&@user_userdetails!=[]%><%=@user_userdetails[0]["时间"]%>，全省WLAN用户数总计<span><%=@user_userdetails[0]["全省WLAN用户数"]%></span>人，环比<%=@user_userdetails[0]["用户变化"]%><span><%=@user_userdetails[0]["用户环比"]%></span>人，其中PC用户<span><%=@user_userdetails[0]["PC用户"]%></span>人，手机用户<span><%=@user_userdetails[0]["手机用户"]%></span>人<%end%>
+    </p>
+    <!--全省WLAN用户数概况-->
+    <%=report_chart("user_analyses_onlineusers")%>
+    <!--全省用户终端统计-->
+    <%=report_chart("user_stationcount")%>
+    <!--全省单用户平均流量统计-->
+    <%=report_chart("user_avgflows")%>
+    <!--全省WLAN用户行为统计-->
+    <%=report_chart("user_useraction")%>
+    <!--tab five-->
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">省内外用户数统计</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("user_localusers","province","#{params[:time_gran]}")%> </div>
+      </div>
+      <br />
+    </div>
+    <!--tab six-->
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">省内外用户流量统计</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("user_localflows","province","#{params[:time_gran]}")%> </div>
+      </div>
+      <br />
+    </div>
+  </div>
+  <div class="index_main">
+    <div class="index_title"><img src="images/first_page/index_icon.png" />&nbsp;&nbsp;网络异常概况</div>
+    <p><%if @user_userdetails&&@user_userdetails!=[]%><%=@user_userdetails[0]["时间"]%>，WLAN网络关联失败次数为<span><%=@user_userdetails[0]["WLAN网络关联失败次数"]%></span>人，同比<%=@user_userdetails[0]["关联变化"]%><span><%=@user_userdetails[0]["关联环比"]%></span>人
+      ，Portal上线失败次数为<span><%=@user_userdetails[0]["Portal上线失败次数"]%></span>人，同比<%=@user_userdetails[0]["Portal变化"]%><span><%=@user_userdetails[0]["Portal环比"]%></span>人 <%end%></p>
+    <!--tab network_anomaly-->
+    <%=report_chart("network_anomaly")%>
+    <!--tab eight-->
+    <%=report_chart("network_portal")%>
+
+    <!--tab nine-->
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">AC关联失败率排行</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("network_anomaly_rake","province","#{params[:time_gran]}")%> </div>
+      </div>
+    </div>
+    <!--tab ten-->
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">Portal上线失败率排行</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("network_online_rake","province","#{params[:time_gran]}")%> </div>
+      </div>
+    </div>
+  </div>
+  <div class="index_main">
+    <div class="index_title"><img src="images/first_page/index_icon.png" />&nbsp;&nbsp;错误码概况</div>
+    <p><%@user_codedetail=instance_variable_get("@province_#{params[:time_gran]}_user_codedetail")%>
+      <%if @user_codedetail&& @user_codedetail!=[]%> <%=@user_codedetail[0]["时间"]%>，错误码总数共有<span><%=@user_codedetail[0]["错误码总数"]%></span>条,Portal上线失败错误码总数共有<span><%=@user_codedetail[0]["Portal上线类错误码总数"]%></span>条,关联类错误码总数共有<span><%=@user_codedetail[0]["关联类错误码总数"]%></span>条</span><%end%>
+    </p>
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">全省关联类错误码分布</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("network_anomaly_distribute","province","#{params[:time_gran]}")%> </div>
+      </div><br/><br/>
+    </div>
+    <!--tab ten-->
+    <div class="index_chart">
+      <div class="Menubox">
+        <ul>
+           <li class="hover" style="width:180px">全省用户上线类错误码分布</li>
+        </ul>
+      </div>
+      <div class="Contentbox">
+        <div ><%freed_report_chart("user_online_distribute","province","#{params[:time_gran]}")%> </div>
+      </div><br/><br/>
+    </div>
+  </div>
+</div>
