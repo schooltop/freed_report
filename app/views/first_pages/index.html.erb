@@ -1,3 +1,41 @@
+
+  <%=javascript_include_tag "FusionCharts.js"%>
+
+<div class="index_wrap">
+  <% form_tag(url_for(:controller=>"first_pages")) do%>
+    <div class="time_title" onclick="slideToggle()">高级搜索&nbsp;&nbsp;<%#=image_tag('/images/time_title.png')%>
+    </div>
+    <ul id="divObj" class="time_block" style="display:none">
+      <li><%= label_tag :time_gran,"时间粒度：" %>
+        <%= select :time_gran,"",[["月","month"],["日","day"]],{:include_blank =>false,:selected=>params[:time_gran]},:class => "select_01",:id=>"time_gran",:onchange=>"changedate()"%>
+      </li>
+      <li style="margin-left:30px;" id="date_gran">
+        <%if params[:time_gran]&&params[:time_gran]=="day"%>
+          <%=render :partial=>"common_components/time_date"%>
+        <%elsif params[:time_gran]&&params[:time_gran]=="month"%>
+          <%=render :partial=>"common_components/time_month"%>
+        <%end%>
+      </li>
+      <li style="margin-left:10px;">
+        <%= submit_tag "",:id=>"submit_conditions",:name => nil ,:class =>"button_01",:onclick =>"return checktime();"%>&nbsp;
+      </li>
+    </ul>
+  <%end%>
+
+  <div class="index_main">
+    <div class="index_title"><img src="images/first_page/index_icon.png" />&nbsp;&nbsp;用户概况</div>
+    <!--全省WLAN用户数概况-->
+    <%=report_chart("user_analyses_onlineusers")%>
+    <!--全省用户终端统计-->
+    <%=report_chart("user_stationcount")%>
+    <!--全省单用户平均流量统计-->
+    <%=report_chart("user_avgflows")%>
+    <!--全省WLAN用户行为统计-->
+    <%=report_chart("user_useraction")%>
+    <!--tab five-->
+ </div>
+
+
 <script language="javascript" type="text/javascript">
 
   function setTab(name,cursel,n){
@@ -70,38 +108,3 @@ $("#divObj").slideToggle();//窗帘效果的切换,点一下收,点一下开,参
     }
   }
 </script>
-  <%=javascript_include_tag "FusionCharts.js"%>
-
-<div class="index_wrap">
-  <% form_tag(url_for(:controller=>"first_pages")) do%>
-    <div class="time_title" onclick="slideToggle()">高级搜索&nbsp;&nbsp;<%#=image_tag('/images/time_title.png')%>
-    </div>
-    <ul id="divObj" class="time_block" style="display:none">
-      <li><%= label_tag :time_gran,"时间粒度：" %>
-        <%= select :time_gran,"",[["月","month"],["日","day"]],{:include_blank =>false,:selected=>params[:time_gran]},:class => "select_01",:id=>"time_gran",:onchange=>"changedate()"%>
-      </li>
-      <li style="margin-left:30px;" id="date_gran">
-        <%if params[:time_gran]&&params[:time_gran]=="day"%>
-          <%=render :partial=>"common_components/time_date"%>
-        <%elsif params[:time_gran]&&params[:time_gran]=="month"%>
-          <%=render :partial=>"common_components/time_month"%>
-        <%end%>
-      </li>
-      <li style="margin-left:10px;">
-        <%= submit_tag "",:id=>"submit_conditions",:name => nil ,:class =>"button_01",:onclick =>"return checktime();"%>&nbsp;
-      </li>
-    </ul>
-  <%end%>
-
-  <div class="index_main">
-    <div class="index_title"><img src="images/first_page/index_icon.png" />&nbsp;&nbsp;用户概况</div>
-    <!--全省WLAN用户数概况-->
-    <%=report_chart("user_analyses_onlineusers")%>
-    <!--全省用户终端统计-->
-    <%=report_chart("user_stationcount")%>
-    <!--全省单用户平均流量统计-->
-    <%=report_chart("user_avgflows")%>
-    <!--全省WLAN用户行为统计-->
-    <%=report_chart("user_useraction")%>
-    <!--tab five-->
- </div>
