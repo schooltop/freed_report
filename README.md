@@ -249,9 +249,7 @@ require "fusioncharts_helper"
 xml = Builder::XmlMarkup.new
 
 xml.chart(to_chart_hash(@column.chart_attributes))do
-
-#此部分为X轴列值渲染
-
+   #此部分为X轴列值渲染
    if @column.chart_row&&@column.chart_row!=""
 
       xml.categories do
@@ -306,8 +304,8 @@ xml.chart(to_chart_hash(@column.chart_attributes))do
 
   end
 
-#注释：此部分为附加轴数据渲染
-
+ #注释：此部分为附轴数据渲染
+  
   if @column.chart_xs&&@column.chart_xs!=""
 
     for columnall in @column.chart_xs.split(",")
