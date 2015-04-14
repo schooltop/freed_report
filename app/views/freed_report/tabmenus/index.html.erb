@@ -1,0 +1,107 @@
+
+  <% content_for :head do %>
+  <style type="text/css">
+    .enterprises{
+    }
+  </style>
+  <script type="text/javascript">
+    jQuery(function(){
+      var getSelectBox = function(){
+        return $("#devices_grid").find('input[name^=ids]:checked');
+      };
+      //新建单位
+      $('.devices_control input[name=add]').click(function(){
+        $("#enterprise_form").attr("action","/freed_report/tabmenus/new").submit();
+      });
+      //关闭规则
+      var form = $('#enterprise_form');
+      $(".actions input[name=delete]").click(function(){
+        if(getSelectBox().length>0){
+          if(confirm("确认关闭这些模版？"))
+            form.attr("action","<%= url_for(:action => 'destroy',:top_style=>1) %>").submit();
+        }else{
+          alert("请选择需要关闭的模版")
+          return;
+        }
+      });
+      
+      //开放规则
+      var form = $('#enterprise_form');
+      $(".actions input[name=open]").click(function(){
+        if(getSelectBox().length>0){
+          if(confirm("确认开放这些模版？"))
+            form.attr("action","<%= url_for(:action => 'destroy',:top_style=>0) %>").submit();
+        }else{
+          alert("请选择需要开放的模版")
+          return;
+        }
+      });
+
+    });
+  </script>
+<% end %>
+<div class="users">
+  <% content_for :header_title, "导航菜单管理" %>
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <div class="control clearfix">
+    <p class="actions devices_control">
+      <%= tag('input',:type =>'button',:value =>'新建',:name => 'add', :class =>controlled("freed_report/tabmenus/new")) %>
+      <%= tag('input',:type =>'button',:value =>'关闭',:name => 'delete',:class =>controlled("freed_report/tabmenus/destroy"))%>
+      <%= tag('input',:type =>'button',:value =>'开放',:name => 'open',:class =>controlled("freed_report/tabmenus/destroy"))%>
+    </p>
+    <div class="filters">
+      <table>
+        <tr>
+          <td>
+            <%= tag('input', :type => 'hidden',:value => @current_user.login ,:name => 'login', :id => 'login') %>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <%
+  sort_url = params.merge({:page => nil})
+%>
+  <div id="devices_grid">
+    <%top_sypes={"0"=>"开放","1"=>"关闭"}%>
+    <% form_tag(url_for(:action => 'edit'), :method=>:post ,:id =>'enterprise_form') do%>
+      <% ui_grid_for @grid do |g, cols, data| %>
+        <% g.head do %>
+          <% g.r do %>
+            <%= g.h check_box_tag('select_all'), :class =>"ui-grid-select" %>
+            <%= g.h "", :style => 'width:40px' %>
+            <%= g.format_sort(:parent_id, "父节点",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:name, "菜单名称",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:url,"链接", :html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:top_style,"状态", :html => {:width => nil}, :url =>sort_url) %>
+          <% end %>
+        <% end %>
+        <% g.body do %>
+          <% if data.size >0 %>
+            <% data.each do |d| %>
+                <% g.r do %>
+                  <% if d.user_id == @current_user.id || @current_user.id == 1 %>
+                    <%= g.d check_box_tag('ids['+d.id.to_s+']'),:class => "ui-grid-select" %>
+                  <% else %>
+                    <%= g.d "" %>
+                  <%end%>
+                  <% g.d :class =>"ui-grid-actions" ,:style=>"width:120px"do %>
+                    <%= link_to ui_icon('pencil'), {:action => 'edit',:id => d.id},{:method => :post, :title => "编辑",:class =>controlled("freed_report/tabmenus/edit")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('close'), {:action => 'destroy',:id => d.id,:top_style=>1},{:method => :post, :title => "关闭",:class =>controlled("freed_report/tabmenus/destroy")}, {:class => 'destroy'} %>
+                    <%= link_to ui_icon('show'), {:action => 'destroy',:id => d.id,:top_style=>0},{:method => :post, :title => "开放",:class =>controlled("freed_report/tabmenus/destroy")}, {:class => 'destroy'} %>
+                  <% end %>
+                  <%=g.d FreedReport::Tabmenu.parent_name(d[:parent_id]) %>
+                  <%=g.d d[:name] %>
+                  <%=g.d d[:url] %>
+                  <%=g.d top_sypes[d[:top_style].to_s] %>
+               <% end %>
+            <% end %>
+          <%else%>
+            <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

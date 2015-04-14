@@ -1,0 +1,2 @@
+module Report::TerminalAnalysisHelper
+end

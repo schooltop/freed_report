@@ -1,0 +1,36 @@
+<fieldset style="padding: 5px;" class="ui-widget-content ui-corner-all">
+            <%chart3_set = chart_set(3).nil? ? {} : chart_set(3)%>
+            <legend>
+              <%=check_box_tag :chart3_enabled, "",false, :style => "", :chart_name => "chart3", :class=>" chart-enabled"%>
+              <%=label_tag :chart3_enabled, "图表三设置", :class => "", :style => ""%>
+            </legend>
+            <div class="chart3 chart">
+              <input type="hidden" name="perf_template[chart_sets][][chart_seq]" value="3" class="chart3">
+              <div class="li">
+                <%=label_tag "perf_template[chart_sets][][chart_name]",'图表名称',:class=>'label'%>
+                <%=text_field_tag "perf_template[chart_sets][][chart_name]", chart3_set.chart_name, :class=>" chart3"%>
+              </div>
+              <div class="li">
+                <%=label_tag "perf_template[chart_sets][][chart_type]",'图表类型',:class=>'label'%>
+                <%=select_tag "perf_template[chart_sets][][chart_type]", options_for_select(Rms::ReportTemplateCandidate.report_type_candidates, chart3_set.chart_type.nil? ? nil : chart3_set.chart_type.to_i),{:class=>' chart3'}%>
+              </div>
+              <div class="li">
+                <%=label_tag "perf_template[chart_sets][][x_col]",'图表横轴',:class=>'label'%>
+                <%=select_tag "perf_template[chart_sets][][x_col]", options_for_select([["", ""]]),{:id => "chart3-xcol", :except =>"chart3", :class => " chart3 x_axis chart3_x_axis"}%>
+              </div>
+              <div class="li">
+                <fieldset style="padding: 1px;width:38%;" class="ui-widget-content ui-corner-all col left">
+                  <legend>可选分组属性</legend>
+                  <%=select_tag :chart3_candidate, [], {:multiple => true, :id=>"chart3-candidate",:class =>" chart3 chart3-except candidate time-gran-effect", :style => "height:100px;width:130px;border:none;"}%>
+                </fieldset>
+                <div class="col left" style="width:20px;height:100px;margin-top:5px;text-align:center;">
+                  <%=image_tag "right.gif", :style => "margin-top: 40px;cursor:pointer;", :class=>"mover", :direct=>"right", :candidate => "chart3-candidate", :selected => "chart3-selected"%>
+                  <%=image_tag "left.gif", :style => "margin-top: 20px;cursor:pointer;", :class=>"mover", :direct=>"left", :candidate => "chart3-candidate", :selected => "chart3-selected"%>
+                </div>
+                <fieldset style="padding: 1px;width:38%;" class="ui-widget-content ui-corner-all col left">
+                  <legend>已选分组属性</legend>
+                  <%=select_tag "perf_template[chart_sets][][group_col]", [],{:multiple => true, :id => "chart3-selected", :class => " chart3 chart3-except selected time-gran-effect", :style => "height:100px;width:95%;border:none;"}%>
+                </fieldset>
+              </div>
+            </div>
+          </fieldset>

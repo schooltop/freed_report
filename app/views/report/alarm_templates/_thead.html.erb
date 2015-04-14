@@ -1,0 +1,20 @@
+<% 
+  sort_direction = params[:sort_direction].nil? ? '':params[:sort_direction].upcase
+%>
+<th>
+  <%=check_box_tag('select_all')%>
+</th>
+ <th align="center">
+   
+  </th>
+<% column_display_names.each do |name| %>
+  <th class="<%=ActionController::RecordIdentifier.singular_class_name(model)%>_<%=name%>">
+    <% if(name == params[:sort]) %>
+      <% sort_direction = (sort_direction=='DESC')?'ASC':'DESC'%>
+    <%end%>
+    <%=link_to model.human_attribute_name(name),:action=>controller.action_name,:sort=>name,:sort_direction=>sort_direction %>      
+  </th>
+<% end %>
+<%if has_actions%>
+ 
+<%end%>

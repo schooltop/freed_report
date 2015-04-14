@@ -1,0 +1,12 @@
+<div class="chart_bg" id="user_data">
+  <% if @user_analyses.nil?||@user_analyses.empty?%>
+    <div style="height:50%;font-family:'宋体';font-size:12px;padding:0 5px;padding-left:50%;position:relative;color:#184D97;">
+      <p>没有数据!</p></div>
+  <%else
+    str_xml = render "ult_user_analyses/builder/user_data.builder",{:arr_data=>@user_analyses}
+    str_xml = str_xml.gsub("caption_name","全省分地市用户数分析")
+    str_xml = str_xml.gsub("units","个数")
+    render_chart '/FusionCharts/MSColumn3D.swf','',str_xml,'user_data', 1090, 310, false, false do-%>
+    <%end%>
+  <%end%>
+</div>

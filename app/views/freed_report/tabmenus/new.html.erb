@@ -1,0 +1,69 @@
+<% content_for :head do %>
+<%=javascript_include_tag  'prototype' %>
+<script type="text/javascript">___saveJQFromPrototype = jQuery; jQuery = undefined; jQuery = undefined;</script>
+<script type="text/javascript">jQuery = ___saveJQFromPrototype; jQuery = ___saveJQFromPrototype;</script>
+ <script type="text/javascript">
+  function togo(){
+    jQuery('#mark_targ').toggle();
+    jQuery('#tabmenu_time_gran').attr("value","");
+    jQuery('#tabmenu_area_gran').attr("value","");
+  }
+
+  function helpshow(){
+    jQuery('#mark_help').show('slow');
+  }
+
+  function helphide(){
+    jQuery('#mark_help').hide('slow');
+  }
+
+</script>
+<% end %>
+<% content_for :header_title, "创建导航菜单" %>
+
+<div  style="position: absolute; visibility: visible; z-index: 1000; right: 268px; top: 367px; background-image: none;">
+  <a href="#" onclick="helpshow()"><%=image_tag("/stylesheets/themes/ultrapower/images2/help.gif")%>帮助</a>
+</div>
+
+<div id="mark_help" style="display:none;position: absolute; visibility: visible; z-index: 1000; right: 40px; top: 167px; background-image: none;">
+  <table width="300" border="0" cellpadding="1" cellspacing="0" class="olBgClass">
+      <tbody><tr><td><table width="100%" border="0" cellpadding="2" cellspacing="0" class="olCgClass">
+       <tbody><tr><td width="100%" class="olCgClass">
+          <div class="olCapFontClass">
+            <div style="float:left">SQL填写注意事项：</div>
+            <a href="javascript:return cClick();" title="关闭" onclick="helphide()">
+              <span style="color:#eeeeff;font-family:Verdana,Arial,Helvetica;font-size:67%;text-decoration:underline;">
+                <div style="float: right"><img border="0" style="margin-left:2px; margin-right: 2px;" src="/stylesheets/themes/ultrapower/images2/close.gif"></div>
+              </span></a></div></td></tr></tbody></table><table width="100%" border="0" cellpadding="2" cellspacing="0" class="olFgClass">
+                <tbody><tr><td valign="top" class="olFgClass">
+                  <div class="olFontClass">
+                    <p><br><strong><font color="#ddd">URL地址：</font></strong></p>
+                    <ul>
+                      <li>手动配置报表ULR样例：<font color="#ff0000">ult_report/perf_reports?reporttype=1&id=427881</font></li>
+                      <li>编写SQL报表URL样例：<font color="#ff0000">freed_report/ult_freed_reports?report_id=74</font></li>
+                      <li>不以<font color="#ff0000">“/”</font>开头，每级目录用<font color="#ff0000">“/”</font>隔开，第一个参数用<font color="#ff0000">“？”</font>号连接其他参数<font color="#ff0000">“&”</font>号连接</font></li>
+                      <li><font color="#ff0000">手动配置报表和SQL编写报表会自动添加连接地址。</font></li>
+                      <li><font color="#ff0000">收缩菜单不需要设置URL地址连接</font></li>
+                    </ul>
+                    <p><strong><font color="#ddd">备注：</font></strong></p>
+                    <ul>
+                      <li>导航条设置的时候<font color="#ff0000">所属导航</font>选择<font color="#ff0000">新建导航</font></li>
+                      <li>导航条设置的时候<font color="#ff0000">菜单父节点</font>选择<font color="#ff0000">置顶节点</font></li>
+                      <li>设置收缩菜单的时候<font color="#ff0000">菜单父节点</font>选择<font color="#ff0000">置顶节点</font></li>
+                    </ul>
+                  </div>
+                    </td></tr></tbody></table></td></tr></tbody></table>
+</div>
+
+<% form_for :tabmenu, @tabmenu,:url => {:action => 'create'}, :html => {:class => "form ui-widget"} do |@f| -%>
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <% field_set_tag nil, :style => "padding: 1em;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class="wrap">     
+             <%=render :partial=>"db_check",:object=>@f%>
+   </div>
+    <div class="li" align="center">
+        <%= @f.submit '确定' %>
+        <%=link_button_to "取消", params.except(:authenticity_token,:id).merge!({:controller=>:tabmenus, :action=>:index})%>
+    </div>
+  <% end %>
+<% end -%>

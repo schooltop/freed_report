@@ -1,0 +1,29 @@
+<%% content_for :head do %>
+  <script type="text/javascript">
+    $(function(){
+    });
+  </script>
+  <style type="text/css">
+  </style>
+<%% end %>
+<%% form_for @<%= singular_name %>, :html => { :class => "form ui-widget" } do |f| %>
+  <%%= ui_error f.error_messages unless f.error_messages.empty? %>
+  <%% field_set_tag nil, :style => "padding: 1em;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class="wrap">
+
+      <% for attribute in attributes -%>
+        <div class="li">
+          <%%= f.label :<%= attribute.name %> , nil, :class => 'label' %>
+          <%%= f.<%= attribute.field_type %> :<%= attribute.name %> %>
+        </div>
+      <% end -%>
+        <div class="li">
+          <%%= label_tag '', '', :class => 'label' %>
+          <%%= hidden_field_tag :redirect_to, params[:redirect_to] %>
+          <%%= f.submit ["new","create"].include?(controller.action_name) ? t("create") : t("update"), :name => nil %>
+          <%%= link_button_to t("back"), params[:redirect_to] || <%= table_name %>_path, :name => nil %>
+        </div>
+    </div>
+  <%% end %>
+<%% end %>
+

@@ -1,0 +1,2 @@
+module Report::CollegeReportsHelper
+end

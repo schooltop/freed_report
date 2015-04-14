@@ -1,0 +1,46 @@
+     <div class="li">
+             <div class="col left">
+               <label class="label label" for="ult_report_model_time_gran"><em>*</em>选择数据源：</label>
+                <%if params[:ult_report_model]%>
+                   <%=select :ult_report_model,:ultra_company_db_model_id,FreedReport::UltraCompanyDbModel.all.collect{|c| [c.db_name,c.id.to_s]},{:include_blank => "新建",:selected=>params[:ult_report_model][:ultra_company_db_model_id]},:onchange=>"check_work()"%>
+                <%else%>
+                   <%=select :ult_report_model,:ultra_company_db_model_id,FreedReport::UltraCompanyDbModel.all.collect{|c| [c.db_name,c.id.to_s]},{:include_blank => "新建",:selected=>"#{params[:ultra_company_db_model_id]}"},:onchange=>"check_work()"%>
+                <%end%>
+             </div>
+             <div class="col right">
+                <label class="label label" for="ult_report_model_time_gran"><em>*</em>数据源类型：</label>
+                  <%=select( "db_style","",[['oracle','oracle'],["mysql",'mysql']],:selected=>params[:db_style])%>
+             </div>
+     </div>
+     <div class="li">
+             <div class="col left">
+                  <label class="label label" for="ult_report_model_time_gran"><em>*</em>数据源别名：</label>
+                  <%= text_field_tag :db_name,params[:db_name],:value=>params[:db_name],:class=>"text ui-input"%>
+             </div>
+             <div class="col right">
+                  <label class="label label" for="ult_report_model_time_gran"><em>*</em>数据库实例名：</label>
+                  <%= text_field_tag :db_service,params[:db_service],:value=>params[:db_service],:class=>"text ui-input"%>
+             </div>
+     </div>
+
+     <div class="li">
+             <div class="col left">
+                  <label class="label label" for="ult_report_model_time_gran"><em>*</em>数据源帐号：</label>
+                  <%= text_field_tag :db_user,params[:db_user],:value=>params[:db_user],:class=>"text ui-input"%>
+             </div>
+             <div class="col right">
+                  <label class="label label" for="db_password"><em>*</em>数据源密码：</label>
+                  <%= text_field_tag :db_password,params[:db_password],:value=>params[:db_password],:class=>"text ui-input"%>
+             </div>
+     </div>
+
+     <div class="li">
+             <div class="col left">
+                  <label class="label label" for="db_host"><em>*</em>数据源IP：</label>
+                  <%= text_field_tag :db_host,params[:db_host],:value=>params[:db_host],:class=>"text ui-input"%>
+             </div>
+             <div class="col right">
+                  <label class="label label" for="db_port"><em>*</em>数据源端口：</label>
+                  <%= text_field_tag :db_port,params[:db_port],:value=>params[:db_port],:class=>"text ui-input"%>
+             </div>
+     </div>

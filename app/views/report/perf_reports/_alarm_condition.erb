@@ -1,0 +1,16 @@
+<div style="margin-top:5px;">统计范围：<%=params[:netloc_cns]%></div>
+<div class="clearfix" style="margin-top:5px;">
+  <div style="width:180px" class="left">时间粒度：<%=time_gran_text(@perf_template.time_gran)%></div>
+  <div style="width:180px" class="left">区域粒度：<%=netloc_grans_text(@perf_template.netloc_gran)%></div>
+</div>
+<div class="clearfix" style="margin-top:5px;">
+  <%
+  dic_group_cn = []
+  unless @perf_template.dic_group.nil?%>
+    <%@perf_template.dic_group.split(",").each{|group|
+      dic_group_cn << alarm_template_dic_group_text(group)
+    %>
+    <%}%>
+  <%end%>
+  <div class="left">分类选项：<%=dic_group_cn.join(",")%></div>
+</div>

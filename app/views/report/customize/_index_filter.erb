@@ -1,0 +1,36 @@
+<fieldset style="padding: 5px;height:150px;" class="ui-widget-content ui-corner-all">
+  <legend>
+    指标过滤条件
+  </legend>
+  <div id="port_filter_conditions" style="overflow:auto;height:130px;">
+  </div>
+</fieldset>
+<script type="text/javascript">
+  $(function(){
+    $("#region_gran_row").css("display", "none");
+    var indexFilter = "<%=@perf_template.index_filter%>";
+    $("#kiplist").change(function(e){
+      var selectedIndexes = $("#kiplist option:selected");
+      $("#port_filter_conditions").empty();
+      $.each(selectedIndexes, function(i, index){
+        var filter_template = $("#filter_template").html();
+        filter_template = filter_template.replace(/{index_name}/g, $(index).text()+ "(" + $(index).attr("unit") + ")" );
+        filter_template = filter_template.replace(/{index_ename}/g, $(index).attr("ename"));
+        $("#port_filter_conditions").append(filter_template);
+      });
+      $("#port_filter_conditions").find("input[type='text'],select").attr("disabled", true);
+      $(".indexEnable").click(function(){
+        $($(this).parent().parent()).find("input[type='text'],select").attr("disabled", !$(this).attr("checked"));
+      });
+      if (indexFilter.length > 0) {
+        var index = indexFilter.split(" and ");
+        $.each(index, function(i, params){
+          params = params.split(" ");
+          $("#" + params[0]).attr("checked", true).click().attr("checked", true);
+          $("#" + params[0] + "_op").val(params[1]);
+          $("#" + params[0] + "_value").val(params[2]);
+        });
+      }
+    });
+  });
+</script>

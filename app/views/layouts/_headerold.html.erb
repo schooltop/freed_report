@@ -1,0 +1,71 @@
+<%=stylesheet_link_tag "crm-style",'deprecated','colors.sugar','fonts.normal' %>
+
+<div id="header" class="ui-toolbar">
+   <div id="header-inner" class="clearfix">
+    <div id="navbar" style="width: 100% !important;">
+<div id="header">
+      <div id="companyLogo">
+        <%=image_tag "/images/crm/company.png"%>
+      </div>
+      
+  <div class="yui-panel-container yui-dialog yui-overlay-hidden shadow" id="themepickerDialog_c" style="visibility: hidden; z-index: 2; ">
+    <div id="themepickerDialog" style="visibility: inherit; width: 250px; " class="yui-module yui-overlay yui-panel">
+      <a class="container-close" href="Home&action=index#">Close</a></div></div>
+  <div id="globalLinks">
+    <ul>
+        <li>
+           <%if @current_user %><%=link_to @current_user.name, :controller => '/personal' %>
+              <span class="pipe">|</span>
+            <%end %>
+        </li>
+        <li>
+          <%= link_to t('help'), "/WlanHelp/WLAN_HELP.htm", :target => "_blank"%>
+        </li>
+    </ul>
+  </div>
+  <div id="welcome">
+    <% %w(critical major minor warning indeterminate clear).each do|severity| %>
+            <%=eventbox(severity, 0) %>
+    <%end %>
+  </div>
+  <div class="clear"></div>
+      <div id="search">
+        <%=javascript_include_tag '/validate_js/search.js'%>
+        <form action="/search" onsubmit="return validate_form(this)">
+          <input type="text" name="query_string" id="query_string" size="20" value="">&nbsp;
+          <input type="submit" class="button" value="查找">
+        </form><br>
+        <div id="unified_search_advanced_div"> </div>
+      </div>
+  <span id="sm_holder"></span>
+     <div class="clear"></div>
+  <div id="moduleList">
+    <ul>
+      <li class="noBorder">&nbsp;</li>
+      <%=this_title_select :home,""%>
+      <%=this_title_select :faultmgr,"fault/events"%>
+      <%=this_title_select :monetmgr,"monet"%>
+    </ul>
+  </div>
+     <div class="clear"></div>
+
+  <div id="subModuleList">
+    <span id="moduleLink_0" style="margin-left: 1px; ">
+      <ul>
+          <li>
+            <a href="/xiao_main" id="moduleTab_0_Home">全部</a>
+          </li>
+          <li>
+            <a href="/charts" id="moduleTab_0_Dashboard">正常</a>
+          </li>
+          <li>
+            <a href="/charts" id="moduleTab_0_Dashboard">实施</a>
+          </li>
+      </ul>
+    </span>
+  </div>
+     <div class="clear"></div>
+  <div class="line"></div>
+</div>
+
+    </div> </div></div>

@@ -1,0 +1,60 @@
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="index, follow" />
+  <title><%= controller.title ? "#{controller.title} - #{t('production_name')}" : t('production_name') %></title>
+  <meta name="keywords" content="WIFI, WLAN网管" />
+  <meta name="description" content="WLAN综合网管系统" />
+  <%=javascript_include_tag 'ui/jquery' %>
+  <%=javascript_include_tag 'ui/ui/effects.core' %>
+  <%=javascript_include_tag 'ui/ui/ui.core' %>
+  <%=javascript_include_tag 'ui/layout' %>
+  <%=javascript_include_tag 'ui/ui/jquery.jplayer' %>
+  <%=stylesheet_link_tag 'ui/sidebar',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/core',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/layout',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/icons',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/ui/ui.core',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.grid',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.grid' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.menu',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.menu' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.switchpanel',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.switchpanel' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.pagination',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.pagination' %>
+  <%=javascript_include_tag 'ui/widget/widget.placeholder' %>
+  <%=javascript_include_tag "GISCookie.js"%>
+  <%=stylesheet_link_tag 'webport', :media=>'all' %>
+  <%=javascript_include_tag 'application' %>
+  <%=stylesheet_link_tag 'themes/ultrapower/ui.theme',:media=>'all'  %>
+  <script>
+    $(function(){
+      $.cookie("last_alarm_check_time", "<%=Time.now%>");      
+      $('.ui-menu').menu();
+      $('.ui-grid').grid();
+      $('.ui-switchpanel').switchpanel();
+      $('.ui-pagination').pagination();
+      $('.ui-placeholder').placeholder();
+      $("#begin_time,#end_time,#range_start,#range_end").attr("readonly",true);
+<% if current_user %>
+      $('#eventbox-container').load('/fault/summaries');
+      //轮询
+<%end%>
+  });
+  $(document).ready(function(){
+    var ids= $('#windowtips');
+    setTimeout(function(){
+      if(ids.length!=0){
+        ids.slideUp();
+      }
+    },10000);
+  });
+  $(function(){
+    $(".access_controlled").each(function(){
+      $(this).attr("disabled",true).attr("title","当前没有权限");
+    }).click(function(){return false;});
+  });
+  </script>
+  <%= yield :head %>
+</head>

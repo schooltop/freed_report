@@ -1,0 +1,218 @@
+<style type="text/css">
+  .form .label{
+    width:10.3%;
+  }
+  .form .text{
+    width: 87%;
+  }
+  .form .col .label{
+    width:22.5%;
+  }
+  .form .col .text{
+    width: 68%;
+  }
+  .form .col .select{
+    width: 70%;
+  }
+  .form fieldset{
+    margin-left: .5em;
+    margin-right: .5em;
+  }
+  .category-option{
+    display : none;
+  }
+  select{
+    height: 21px;
+    vertical-align:middle;
+  }
+</style>
+<script type="text/javascript">
+  function checkDicGroup(){
+    var checkedGroups = "<%=@perf_template.dic_group.is_a?(Array) ? @perf_template.dic_group.uniq.join(",") : @perf_template.dic_group%>".split(",");
+    $.each(checkedGroups, function(i, group){
+      if(group != "")
+        $("input[value=" + group + "]").attr("checked", true).click().attr("checked", true);
+    });
+  }
+
+  function checkChartSet(){
+    var chart_sets = "<%=chart_set_seqs.join(",")%>".split(",");
+    $.each(chart_sets, function(i, chart_set){
+      $("input[chart_name=chart" + chart_set + "]").attr("checked", true).click().attr("checked", true);
+    });
+  }
+
+  function changeCndidateByTimeGran(){
+    var timeGran = $("#time_gran option:selected").val();
+    var availableTimeGran = [];
+    $(".gran-effect option[type=time-gran]").remove();
+    $(".x_axis option[type=time-gran]").remove();
+    if( timeGran == '0'){
+      availableTimeGran[0] = "<option type='time-gran' value='年份'>年份</options>";
+      availableTimeGran[1] = "<option type='time-gran' value='季度'>季度</options>";
+    }else if(timeGran == '1'){
+      availableTimeGran[0] = "<option type='time-gran' value='年份'>年份</options>";
+      availableTimeGran[1] = "<option type='time-gran' value='月份'>月份</options>";
+    }else if(timeGran == '2'){
+      availableTimeGran[0] = "<option type='time-gran' value='年份'>年份</options>";
+      availableTimeGran[1] = "<option type='time-gran' value='周'>周</options>";
+    }else if(timeGran == '3'){
+      availableTimeGran[0] = "<option type='time-gran' value='日期'>日期</options>";
+    }else if(timeGran == '4'){
+      availableTimeGran[0] = "<option type='time-gran' value='日期'>日期</options>";
+      availableTimeGran[1] = "<option type='time-gran' value='时段'>时段</options>";
+    }
+    $(".candidate").append(availableTimeGran.join(""));
+    $(".x_axis").append(availableTimeGran.join(""));
+  }
+
+  function changeCandidateByNetGran(){
+    var netlocGran = $("#netloc_gran option:selected").text();
+    $(".gran-effect option[type=netloc-gran]").remove();
+    $(".x_axis option[type=netloc-gran]").remove();
+    if(netlocGran == '') return ;
+    var selectNetlocGran = "<option type='netloc-gran' value='"+netlocGran +"'>"+netlocGran+"</options>" ;
+    $(".candidate").append(selectNetlocGran);
+    $(".x_axis").append(selectNetlocGran);
+  }
+
+  function adjustGroupCol(){
+    var chart_sets = window.eval('<%=@perf_template.chart_sets.to_json%>');
+    $.each(chart_sets, function(i, chart_set){
+      var chart = $("#chart" + chart_set.chart_seq + "-xcol");
+      var groupColCandidate = $("#chart" + chart_set.chart_seq + "-candidate");
+      var groupSelectedCol = $("#chart" + chart_set.chart_seq + "-selected");
+      chart.attr("value", chart_set.x_col);
+      groupColCandidate.find("option[value=" + chart_set.x_col + "]").remove();
+      if(chart_set.group_col){
+        if(!(chart_set.group_col instanceof Array))
+          chart_set.group_col = chart_set.group_col.split(",");
+        $.each(chart_set.group_col, function(i, col){
+          groupColCandidate.find("option[value=" + col + "]").appendTo(groupSelectedCol.get()).attr("selected", true);
+        });
+      }
+    })
+  }
+  function cancelUsers(){
+    $("#perf_template_report_template_users option").attr("selected", false);
+  }
+
+  $(function(){
+    $(".cancelusers").click(function(e){
+      cancelUsers();
+    });
+    $("#time_gran").change(function(e){
+      //对横轴，分组 添加值
+      changeCndidateByTimeGran();
+    });
+    $("#netloc_gran").change(function(e){
+      //对横轴，分组 添加值
+      changeCandidateByNetGran();
+    });
+
+    $(".netloc-effect").click(function(e){
+      //对横轴，分组 添加值
+      var e = $(e.target);
+      if(e.attr("checked") == true){
+        var option = "<option type='netloc-effect' value='" + e.attr("col_value") + "'>" + e.attr("col_value") + "</option>";
+        $(".candidate").append(option);
+        $(".x_axis").append(option);
+      }else{
+        $(".candidate option[value=" + e.attr("col_value")+ "]").remove();
+        $(".x_axis option[value=" + e.attr("col_value")+ "]").remove();
+      }
+    });
+
+    $(".chart-enabled").click(function(e){
+      //对图表的可操作设置
+      var self = $(this);
+      $("."+self.attr('chart_name')).attr('disabled',!self.attr("checked"));
+    })
+
+    $(".x_axis").change(function(e){
+      //对分组值的过滤 还原
+      var self = $(this);
+      var except = self.attr("except");
+      var oldValue = self.attr('old_value');
+      var newValue = self.val();
+      if (oldValue && oldValue != newValue){
+        var optionType = $("." + except + "_x_axis option[value=" + oldValue + "]").attr('type');
+        var option = "<option type='" + optionType + "' value='" + oldValue + "'>" + oldValue + "</option>";
+        $("#" + except + "-candidate").append(option);
+      }
+      self.attr('old_value',newValue);
+      $("." + except + "-except option[value=" + newValue + "]").remove();
+    });
+
+    $(".mover").click(function(e){
+      //分组移动
+      e = $(e.target);
+      var direct = e.attr("direct");
+      var candidate = e.attr("candidate");
+      var selected = e.attr("selected");
+      if(direct == "right"){
+        var selectedOptions = $("#" + candidate + " option:selected");
+        $.each(selectedOptions, function(i, option){
+          $("#" + selected).append(option);
+        })
+      }else{
+        var selectedOptions = $("#" + selected + " option:selected");
+        $.each(selectedOptions, function(i, option){
+          $("#" + candidate).append(option);
+        })
+      }
+    });
+
+    //初始图表设置
+    $(".chart,.chart1,.chart2,.chart3").attr("disabled", true);
+
+    //初始dic_group选择
+    checkDicGroup();
+
+    //初始chart_set选择
+    checkChartSet();
+
+    //初始对横轴，分组 添加值
+    changeCndidateByTimeGran();
+
+    //初始对横轴，分组 添加值
+    changeCandidateByNetGran();
+
+    //对横轴加值，分组减值，数据库的值从待选移动到被选
+    adjustGroupCol();
+  })
+</script>
+<div class="f4">
+  <input type="hidden" name="perf_template[report_type]" value="2">
+  <div class='wrap'>
+    <div class='li'>
+      <div class='left col'>
+        <%=f.label 'time_gran','时间粒度',:class=>'label', :required => true %>
+        <%=f.select :time_gran, time_grans.delete_if {|x| x[1] == 6 || x[1] == 4},{:selected => @perf_template.time_gran.to_i},{:id => "time_gran"}%>
+      </div>
+      <div class='left col' style="">
+        <%=f.label 'netloc_gran','区域粒度',:class=>'label', :required => true %>
+        <%=f.select :netloc_gran, [['省份',0],['地市',1], ['郊县',2], ['热点',5]], {:selected => @perf_template.netloc_gran.to_i}, {:id => "netloc_gran"}%>
+      </div>
+    </div>
+    <div class='li'>
+      <div class="left col" style="">
+        <% field_set_tag '分类选项', :style => "padding: 5px;height:200px;", :class => "ui-widget-content ui-corner-all" do %>
+          <%alarm_template_dic_groups.each do |item|%>
+            <div style="width:48%;float:left;">
+              <%=check_box_tag 'perf_template[dic_group][]',item[0], false,:id=>item[0],:class=>"netloc-effect",:col_value=>item[1]%>
+              <%=label_tag item[0], item[1] %>
+            </div>
+          <%end%>
+        <%end%>
+      </div>
+      <div class="left col">
+        <% field_set_tag '统计范围', :style => "padding: 5px;height:200px;", :class => "ui-widget-content ui-corner-all" do %>
+          <%=render :partial=>'report/domain_selection'%>
+          <input type="hidden" value="<%=net_loc%>" name="perf_template[netloc]" id="netloc" value="">
+          <input type="hidden" value="<%=params[:netloc_cns]%>" name="netloc_cns" id="netloc_cns" value="">
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>

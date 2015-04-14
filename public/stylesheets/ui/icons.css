@@ -1,0 +1,17 @@
+/*share public icons*/
+
+.icon{
+  background-repeat:no-repeat;
+}
+.icon-pdf{
+  background-image:url(icons/pdf.gif);
+}
+.icon-csv{
+  background-image:url(icons/csv.gif);
+}
+.icon-xml{
+  background-image:url(icons/xml.gif);
+}
+.icon-tsv{
+  background-image:url(icons/tsv.gif);
+}

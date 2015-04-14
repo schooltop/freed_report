@@ -1,0 +1,88 @@
+UiForRails
+==========
+
+扩展自jqueryui(http://ui.jquery.com)
+
+Require
+=======
+java  http://www.java.com/
+ant  http://ant.apache.org/
+YUIcompressor  http://developer.yahoo.com/yui/compressor/
+
+
+Usage
+=======
+安装好插件后，执行下面的rake命令自动复制css,js源码到public/stylesheets,public/javascripts 并创建 #{RAILS_ROOT}/config/ui.yml以供自定义合并规则
+
+rake ui:init
+
+rake ui:init! (强制执行)
+
+按照ui.yml规则合并代码
+
+rake ui:merge
+
+压缩源码到min文件夹，产品发布时使用
+
+rake ui:build
+
+View Helper
+=======
+
+目录(stylesheets/ui,javascripts/ui,stylesheets/themes)说明:
+
+jquery官方UI放在stylesheets/ui/ui,javascripts/ui/ui目录
+
+本站开发的UI扩展放在stylesheets/ui/widget/,javascripts/ui/widget/目录
+
+jquery其他插件放在javascripts/ui/extenral/目录
+
+框架核心css放在stylesheets/ui/core/ 
+
+框架布局stylesheets/ui/layout.css
+
+===theme放在stylesheets/目录===
+
+import css
+
+stylesheet_link_tag('ui/core/reset.css')
+
+include js
+
+javascript_include_tag('ui/jquery.js')
+
+Example
+=======
+渲染主题:
+
+widget theme
+
+    #给grid添加class样式 渲染主题
+    #
+    #示例:
+    #
+    #<% ui_grid_theme do %>
+    #  <table id="ui-grid" class="grid">
+    #    <thead>
+    #      <tr><th></th></tr>
+    #    </thead>
+    #    <tbody>
+    #      <tr><td>11</td></tr>
+    #      <tr><td>22</td></tr>
+    #    </tbody>
+    #  </table>
+    #<% end %>
+    #
+    #输出:
+    #
+    #<table class='grid ui-grid ui-widget ui-widget-content ui-corner-all ui-helper-reset' cellSpacing='0' id='ui-grid'>
+    #  <thead>
+    #    <tr class='ui-widget-header'><th/></tr>
+    #  </thead>
+    #  <tbody>
+    #    <tr class='ui-grid-even'><td>11</td></tr>
+    #    <tr class='ui-grid-odd ui-state-light'>22<td/></tr>
+    #  </tbody>
+    #</table>
+
+Copyright (c) 2009 [opengoss.com], released under the MIT license

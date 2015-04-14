@@ -1,0 +1,582 @@
+
+class DashboardController < ApplicationController
+  menu_item 'dashboard'
+  include FaultHelper
+  before_filter :sysnote
+  skip_before_filter :permit_required, :only => [:events_by_severity, :devices_by_severity]
+
+  skip_before_filter CASClient::Frameworks::Rails::Filter, :except => [:index]
+  #skip_before_filter :role_and_domain_required, :except => :index
+  skip_filter :log_operation
+  before_filter :pref, :only => [:index,:events_by_severity,:devices_by_severity,:category_traffic,:actived_user]
+#  before_filter :pref, :only => [:index]
+  after_filter :store_location ,:except=>["set_sys_statue","devices_by_severity","events_by_severity","traffic_user_num_by_port_type","resource_count_by_area","ap_num_by_port_type","wireless_traffic"]
+#  after_filter :store_location ,:except=>["set_sys_statue"]
+  def set_sys_statue
+    mset_sys_statue(params[:st])
+    redirect_to(session[:return_to])
+  end
+
+  def pref
+    @pref = {
+      :mini => current_user.preferred_dashboard_mini,
+      :show => current_user.cityid == 0 ? current_user.preferred_dashboard_show.gsub(',district_by_rate','') : current_user.preferred_dashboard_show,
+      :sort => current_user.cityid == 0 ? current_user.preferred_dashboard_sort.gsub(',district_by_rate','') : current_user.preferred_dashboard_sort
+    }
+    @display = @pref[:show].split(",")
+  end
+
+  def index
+    #    @pref = {
+    #      :mini => current_user.preferred_dashboard_mini,
+    #      :show => current_user.preferred_dashboard_show,
+    #      :sort => current_user.preferred_dashboard_sort
+    #    }
+    session[:return_to]=""
+    session[:return_to]="http://10.132.20.71:90"+request.request_uri
+    session[:sys_tab]="0"  if !session[:sys_tab]||session[:sys_tab]==""
+    selected_value=session[:sys_tab]
+    @dashboard = {
+      :events_by_severity => "告警统计",#yes,sql
+      :events_by_severity_and_type => "告警概要", #sql
+      :sites_by_fault => "热点监控",#yes,sql
+      :devices_by_severity => "告警设备数量统计",#yes,sql
+      # :available_ap_top10 => "昨天退服率最高的AP(TOP10)",
+      :wifi_muc => "最近24小时关联用户数",#yes,errdb
+      :wireless_traffic => "最近24小时无线侧流量变化",#yes, port
+      :ap_traffic_top10 => "昨天流量最高的AP(TOP10)",#yes,ap
+      :ap_peak_top10 => "昨天每AP峰值下载速率最高的热点(TOP10)",#yes,port
+      :ap_relate_top10 => "昨天用户关联成功率最低的AP(TOP10)",#yes,sql
+      :network_state => "昨天各地市网络状况",#yes,port
+      :devices_by_avail => "设备监控(不采集设备除外)",#yes,sql
+      # :devices_by_type => "设备统计",
+      :repeater_by_type => "直放站设备统计",
+      :room_off_point =>"室分点监控",
+      :devices_by_rate => "昨天设备接入率",
+      #:district_by_rate => "区县可用率",
+      :ap_num_by_port_type => "各类型热点AP数量",
+      :resource_count_by_area => "资源数量汇总",
+      :network_element_change => "最近一周网元变更",#yes,sql
+      :traffic_user_num_by_port_type => "昨天各类型热点的流量和用户数占比",#yes,port
+      :supplies => "代维厂家统计",
+      # :category_traffic => "上月分类流量",
+      # :evdo_traffic_top10 => "上月EVDO流量TOP10基站",
+      # :traffic_top10_user => "上月流量TOP10用户",
+      # :actived_user => "上月激活用户数" ,
+      :ap_collect =>"AP采集情况",#yes,sql
+      :ap_fault_rate => "各地市AP故障率统计",
+      :acceptance_criteria => "验收专题展示",
+      :crucial_perfs => "关键指标",
+      :project_status_ap_count => "AP管理情况"
+    }
+    @dashboard = @dashboard.delete_if{|key,value| key == :district_by_rate} if current_user.cityid == 0
+    domain = @current_user.domain
+    @domain_bdn = %r(%#{domain.base}).source
+    cityid = @current_user.cityid
+    #@events_summary = events_summary
+    @events_stats = events_stats if @display.include?("events_by_severity_and_type")
+    @severity = Fault::Severity.all.inject({}) {|hash,s| hash[s.severity_name] = s ; hash}
+    @muc_graph = muc_graph  if @display.include?("wifi_muc")
+    @ap_peak_top = PortalContent.ap_peak_top10(@current_user,selected_value) if @display.include?("ap_peak_top10")
+    @ap_traffic_top = PortalContent.ap_traffic_top10(@current_user,selected_value) if @display.include?("ap_traffic_top10")
+    @ap_relate_top = PortalContent.ap_relate_top10(@current_user,selected_value) if @display.include?("ap_relate_top10")
+    @network_state = PortalContent.network_state(@current_user,selected_value) if @display.include?("network_state")
+    @crucial_perfs = PortalContent.crucial_perfs(@current_user,selected_value) if @display.include?("crucial_perfs")
+    #@location_stats = location_stats if @display.include?("sites_by_fault")
+    @location_room_off_point = location_room_off_point  if @display.include?("room_off_point")
+    @device_stats = device_stats  if @display.include?("devices_by_avail")
+    @device_rate = Site.device_rate(@current_user.domain) if @display.include?("devices_by_rate") #不拆分
+    @network_element_change = PortalContent.network_element_change(@current_user,selected_value)  if @display.include?("network_element_change")
+    @supplies = Supply.supplies_statistics(@current_user.domain.base,@current_user) if @display.include?("supplies")
+    @ap_collect =  ap_collects if @display.include?("ap_collect")
+    @ap_fault_rate = Ap.ap_fault_rate(cityid) if @display.include?("ap_fault_rate")
+    @acceptance_criteria = Rms::WlanApPerfAggrDay.acceptance_criteria(cityid) if @display.include?("acceptance_criteria")
+    #@project_status_ap_count = Ap.project_status_count if @display.include?("project_status_ap_count")
+  end
+
+  def wireless_traffic
+    cityid = @current_user.cityid
+    selected_value=session[:sys_tab]
+    @traffics = Procedure::WLAN_PERF_QRY.new.wireless_traffic(cityid,selected_value)
+    @results = @traffics.results unless @traffics.nil?
+    @results.reverse!
+    unless @results.blank?
+      @wireless_data = ""
+      all_i = []
+      all_o = []
+      total_i = 0
+      total_o = 0
+      i=0
+      @results.each do |result|
+        @ifinoc = format("%.2f", result[3])
+        @ifoutoc = format("%.2f",result[4])
+        total_i = total_i + @ifinoc.to_f
+        total_o = total_o + @ifoutoc.to_f
+        all_i << @ifinoc.to_f
+        all_o << @ifoutoc.to_f
+        @wireless_data << "#{result[2]}" << ";" <<  "#{@ifinoc}" << ";" << "#{@ifoutoc}" << "\n"
+        i=i+1
+      end
+      @max_i = all_i.sort.last
+      @max_o = all_o.sort.last
+      @avg_i = format("%.2f", total_i/i )
+      @avg_o = format("%.2f", total_o/i )
+      @current_i = format("%.2f", @results.last[3])
+      @current_o = format("%.2f",@results.last[4])
+    end
+    @metric=Metric.wlan_table("无线侧接口流量")[7]
+    render :partial => "templates/amline2" , :locals => {:csv_data => @wireless_data , :metric => @metric}
+  end
+
+
+  def traffic_user_num_by_port_type
+    results = PortalContent.traffic_user_num_by_port_type(@current_user,session[:sys_tab])
+    @group_col = ["流量占比", "用户数占比 "]
+    @csv_data = ""
+    unless results.nil?
+      traffics, users = 0, 0
+      results.each do |r|
+        traffics += r.field2.to_f
+        users += r.field3.to_f
+      end
+      results.each do |r|
+        traffic, user=0, 0
+        traffic = format("%.2f",(r.field2.to_f/traffics)*100)
+        user    = format("%.2f",(r.field3.to_f/users)*100)
+        @csv_data << (r.field1.nil? ? '0':r.field1) << ";" << "#{traffic}" << ";" << "#{user}" << "\n"
+      end
+    end
+    @unit = "%"
+    render :partial => "templates/amcolumn"
+  end
+
+  def ap_num_by_port_type #不拆分
+    cityid = current_user.cityid
+    ap_num = Dashboard.count_ap_num_by_port_type(cityid == 0 ? "" : cityid)
+    @group_col = ["热点数量 ","AP数量"]
+    @csv_data = ""
+    ap_num.each do |num|
+      port_type_name = num.port_type_name
+      if port_type_name == '专业市场/电脑城/小商品批发中心'
+        port_type_name = '专业市场'
+      end
+      @csv_data << port_type_name << ";" << num.hotspot_num << ";" << num.ap_num << "\n"
+    end
+    @unit = "个"
+    render :partial => "templates/amcolumn"
+  end
+
+  def resource_count_by_area #不拆分
+    if current_user.is_province_level_user?
+      resource_count = Dashboard.count_nums_by_city.reverse
+    else
+      resource_count = Dashboard.count_nums_by_district(current_user.cityid).reverse
+    end
+    # resource_count = Dashboard.count_nums_by_district(1006).reverse
+    # @resource_chart_height = resource_count.count <= 15 ? 0 : ((resource_count.count - 15) * 20)
+    @resource_chart_height = resource_count.count * 20
+    @csv_data = ""
+    resource_count.each do |resource|
+      @csv_data << resource.city_name << ";" << resource.port_num.to_s << ";" << resource.ac_num.to_s << ";" << resource.ap_num.to_s << "\n"
+    end
+    @column_color = [{:name => "热点数量"}, {:name => "AC数量"}, {:name => "AP数量"}]
+    render :partial => "templates/amcolumn_stacked"
+  end
+
+  def ap_collects
+    Ap.find_by_sql(%Q{select coalesce(city_name,'合计') city_name,max(dn) dn,sum(normal) normal,sum(beta) beta,sum(notcollect) notcollect,
+                   sum(yes_no_collect) yes_no_collect from
+                   (select t.site_cn city_name, t.site_dn dn,
+		               count(case when t.ap_state = 0 or t.ap_state is null then t.ap_state else null end) normal,
+                   count(case when t.ap_state = 1 then t.ap_state else null end) beta,
+                   count(case when t.ap_state = 2 then t.ap_state else null end) notcollect ,
+                   count(case when t.ap_state = 3 then t.ap_state else null end) yes_no_collect
+                   from (select t1.ap_state, t4.site_cn, t4.site_dn
+                   from mit_aps t1,mit_sites t2,mit_sites t3,mit_sites t4
+	                 where t1.port = t2.id and t2.parent_site = t3.id and t3.parent_site = t4.id and t4.site_dn like '%#{@current_user.domain.base}%') t
+	                 group by t.site_cn
+		               order by t.site_cn) tt1
+                   group by tt1.city_name with rollup
+      })
+  end
+
+  #告警统计饼图
+  def events_by_severity
+    domain = @current_user.domain
+    @domain_bdn = %r(%#{domain.base}).source
+    device_type=get_sql_detype(ap_alias=['a2'],ac_alias=['a3'],sw_alias=nil,port_alias=nil)
+    events = Fault::Event.count_by_severity(@domain_bdn,device_type)
+    @csv_data = ""
+    @color = ["0xed4d5a","0xf6983e","0xe6f940","0x43d5fa","0x773ef7","0x00ce00"]
+    level = {"5"=>"一级","4"=>"二级","3"=>"三级","2"=>"四级","1"=>"事件","0"=>"清除"}
+    ["5","4","3","2","1","0"].each do |i|
+      b = false
+      events.each do |e|
+        if e.perceived_severity.to_s==i
+          @csv_data << level[e.perceived_severity.to_s] << ";" << e.count << "\n"
+          b = true
+        end
+      end
+      @csv_data << level[i] << ";" <<"0"<< "\n" if b==false
+    end
+    @unit ="个"
+    render :partial => "templates/ampie"
+  end
+
+  #  月分类流量饼图
+  def category_traffic
+    data = []
+    labels = []
+    color = []
+    category_traffic = Procedure::WlanEvdoWeekQry.new
+    @result = category_traffic.query(1, @current_user)
+    data = @result.results.flatten
+    labels = []
+    color = []
+    @result.column_info.each do |label|
+      labels << label["name"]
+    end
+    @csv_data = ""
+    @color = []
+    color = {"0"=>"00ce00","1"=>"FFB427","2"=>"ffff00","3"=>"fe0100","4"=>"63b9ff"}
+    level = {"0"=>"固网WLAN","1"=>"WLAN","2"=>"移动WLAN","3"=>"CDMA1X","4"=>"EVDO"}
+    data.each_index do |i|
+      @csv_data << level[i.to_s] << ";" << data[i].to_s << "\n"
+      @color << color[i.to_s]
+    end
+    @unit ="G"
+    render :partial => "templates/ampie"
+  end
+
+  #  月激活用户数
+  def actived_user
+    wlan_data = []
+    wlan_aaa_data = []
+    evdo_data = []
+    cdma1x_data = []
+    labels = []
+    actived_user = Procedure::WlanEvdoWeekQry.new
+    @result = actived_user.query(4, @current_user).results
+    @csv_data =""
+
+    @result.each { |result|
+      d =""
+      [0,1,2,3,4].each do |e|
+        if e==0
+          d = result[0].to_date.strftime("%Y-%m-%d") << ";"
+        elsif e==4
+          d = result[0].to_date.strftime("%Y-%m-%d") << ";"
+        else
+          d = result[0].to_date.strftime("%Y-%m-%d") << "\n"
+        end
+        @csv_data << d
+      end
+    }
+
+
+    @metric  = Metric.epon_table("上月激活用户数")[0]
+    render :partial => "templates/amline"
+    respond_to do |format|
+      format.png{
+        c = ChartDirector::XYChart.new(485, 220)
+        c.setDefaultFonts("simsun.ttc", 10)
+        c.setPlotArea(62, 30, 410, 150, 0xffffff, -1, -1, 0xcccccc, 0xcccccc)
+        c.addLegend(50, 0, false, "simsun.ttc", 10).setBackground(
+          ChartDirector::Transparent)
+        c.yAxis().setTitle("单位：个", "simsun.ttc", 10)
+        c.xAxis().setLabelStyle("simsun.ttc", 10)
+        c.xAxis().setLabels(labels)
+        layer = c.addLineLayer()
+        layer.setLineWidth(2)
+        layer.addDataSet(wlan_data, 0x00C957, "固网WLAN")
+        layer.addDataSet(wlan_aaa_data, 0xffff00, "移动WLAN")
+        layer.addDataSet(evdo_data,  0x87CEEB, "EVDO")
+        layer.addDataSet(cdma1x_data, 0xff0000, "CDMA1X")
+        send_data(c.makeChart2(ChartDirector::PNG), :type => "image/png",
+          :disposition => "inline")
+      }
+      format.xml { render :xml => chart.to_xml }
+    end
+  end
+
+  #  告警设备监控柱状图
+  def devices_by_severity
+    domain = @current_user.domain
+    @domain_bdn = %r(%#{domain.base}).source
+    device_type=get_sql_detype(ap_alias=['a2'],ac_alias=['a3'],sw_alias=nil,port_alias=nil)
+    puts "*********************device_type********************:#{device_type}"
+    device = Fault::Event.find_by_sql("select t1.source_class,t1.perceived_severity,count(*) as count from
+                                ( select distinct alarm_source,source_class,perceived_severity from fault_events a1
+                                  left join mit_aps a2 on a1.alarm_source=a2.ap_dn
+                                  left join mit_acs a3 on a1.alarm_source=a3.ac_dn
+                                where source_class<> 'ossServer' and perceived_severity <> 0 and alarm_source like '#{@domain_bdn}' #{device_type} ) t1
+                                group by t1.source_class,t1.perceived_severity
+                                order by t1.source_class,t1.perceived_severity")
+    @csv_data = ""
+    sw_count = []
+    ac_count = []
+    ap_count = []
+    all_count = 0
+    a=b=c=nil
+    device.each do |x|
+      sw_count <<  x if get_source_class_by(x.source_class) == "SW"
+      ac_count <<  x if get_source_class_by(x.source_class) == "AC"
+      ap_count <<  x if get_source_class_by(x.source_class) == "AP"
+    end
+    csv_data1 = "SW;"
+    csv_data2 = "AC;"
+    csv_data3 = "AP;"
+    csv_data4 = "总计;"
+    [5,4,3,2,1,0].each do |i|
+      sw_count.each do |x|
+        if x.perceived_severity.to_i ==i
+          csv_data1  << x.count
+          csv_data1 << ";" unless  i==0
+          a = true
+          all_count +=x.count.to_i
+        end
+      end
+      ac_count.each do |x|
+        if x.perceived_severity.to_i ==i
+          csv_data2  << x.count
+          csv_data2 << ";" unless i==0
+          b = true
+          all_count +=x.count.to_i
+        end
+      end
+      ap_count.each do |x|
+        if x.perceived_severity.to_i ==i
+          csv_data3  << x.count
+          csv_data3 << ";" unless i==0
+          c = true
+          all_count +=x.count.to_i
+        end
+      end
+      unless (a or i==0)
+        csv_data1 << "0;"
+      end
+      unless (b or i==0)
+        csv_data2 << "0;"
+      end
+      unless (c or i==0)
+        csv_data3 << "0;"
+      end
+
+      csv_data4 << all_count.to_s
+      csv_data4 << ";" unless i==0
+      if i==0
+        csv_data1 << "\n"
+        csv_data2 << "\n"
+        csv_data3 << "\n"
+        csv_data4 << "\n"
+      end
+      all_count = 0
+      a=b=c=nil
+    end
+    @csv_data <<  csv_data4 <<   csv_data3 <<  csv_data2<<  csv_data1
+    @column_color = [{:name=>"一级",:color=>"0xed4d5a"},{:name=>"二级",:color=>"0xf6983e"},{:name=>"三级",:color=>"0xe6f940"},{:name=>"四级",:color=>"0x43d5fa"},{:name=>"事件",:color=>"0x773ef7"},{:name=>"清除",:color=>"0x00ce00"}]
+    render :partial => "templates/amcolumn_stacked"
+  end
+
+  private
+  def events_stats
+    device_type=get_sql_detype(ap_alias=['a2'],ac_alias=['a3'],sw_alias=nil,port_alias=nil)
+    events = Fault::Event.count_by_severity_and_type(@domain_bdn,device_type)
+    rows = Hash.new
+    #rows
+    events.each do |e|
+      rows[e.alarm_type] = new_default_row unless rows[e.alarm_type]
+      row = rows[e.alarm_type]
+      row[severity_id2name(e.perceived_severity)] = e.count.to_i
+      rows[e.alarm_type] = row
+    end
+    #caculate row summary
+    rows.each do |key, row|
+      row["summary"] = row.values.inject(0) {|sum, e| sum + e }
+      row["alarm_type"] = get_alarm_type_by(key)
+    end
+    #caclulate total summary
+    summary = new_default_row
+    summary["alarm_type"] = "总计"
+    rows.values.each do |row|
+      summary["critical"] += row["critical"]
+      summary["major"] += row["major"]
+      summary["minor"] += row["minor"]
+      summary["warning"] += row["warning"]
+      summary["indeterminate"] += row["indeterminate"]
+      summary["clear"] += row["clear"]
+      summary["summary"] += row["summary"]
+    end
+    summaries = rows.values << summary
+    summaries
+  end
+
+  def muc_graph
+    domain_base = @current_user.domain.base
+    puts "***********************:domain_base****************"
+    dn=domain_base.split(",")[0]
+    dn = ERB::Util.url_encode(dn)
+    key = dn+':stausers'
+    sta_t=(Time.now-1.days).to_i
+    end_t=Time.now.to_i
+    file=""
+    begin
+      Net::HTTP.start($ERRDB_SERVER, $ERRDB_PORT) {|http|
+        http.open_timeout = 3
+        http.read_timeout = 3
+
+        response = http.get("/rrdb/#{key}/stausers/#{sta_t}-#{end_t}")
+        file << response.body
+      }
+      filter(file)
+      @csv_data = decode(@result,@data,@stauser)
+    rescue Exception => e
+      @csv_data = ""
+    end
+    @length="100%x250"
+  end
+
+  def filter  file
+    unless file=='notfound' || file=='unsupported request'
+      file=file.split("\n")
+      t= file[0].split(":")
+      tt = t[1].split(",")
+      tt.each_index { |i|
+        if tt[i] == "stausers"
+          @stauser=i
+        end
+      }
+      @result={}
+      @data=[]
+      file.each_index { |i|
+        unless i==0
+          d = file[i].split(":")
+          dd = d[1].split(",")
+          @result[d[0]]=dd
+          @data << d[0]
+        end
+      }
+      @result= @result.sort_by { |k,v| k }
+    end
+  end
+
+  def decode(result,data,key)
+    sta_t=(Time.now-1.days).to_i
+    end_t=Time.now.to_i
+    if result
+      @metric_data = ""
+      first_t= data.first.to_i
+      last_t= data.last.to_i
+      if first_t > sta_t
+        i=((first_t-sta_t)/300).to_i
+        first_t=first_t-(i*300)
+        i.times do
+          time= Time.at(first_t).strftime("%m-%d %H:%M")
+          @metric_data << "#{time}" << ";" << "\n"
+          first_t=first_t+300
+        end
+      end
+      @total_num=0
+      @all_num=[]
+      @i=0
+      result.each do |v|
+        time=Time.at(v[0].to_i).strftime("%m-%d %H:%M")
+        val= v[1][key] unless key.blank?
+        @total_num = @total_num + val.to_i
+        @all_num << val.to_i
+        @metric_data << "#{time}" << ";" << "#{val}" << "\n"
+        @i = @i+1
+      end
+      if last_t < end_t
+        k=((end_t-last_t)/300).to_i
+        k.times do
+          last_t=last_t+300
+          time= Time.at(last_t).strftime("%m-%d %H:%M")
+          @metric_data << "#{time}" << ";" << "\n"
+        end
+      end
+      @current_num = result.last[1][key]
+      @max_num = @all_num.sort.last.to_i
+      @avg_num = @total_num/@i
+    end
+    return @metric_data
+  end
+
+
+
+  def location_stats
+    sites = Area.count_by_sites(@current_user.domain.base)
+    unless session[:sys_tab].eql?("0")
+      fault_device_type="and t3.ap_state=0" if session[:sys_tab].eql?("1")
+      fault_device_type="and t3.ap_state=1" if session[:sys_tab].eql?("2")
+    else
+      fault_device_type=""
+    end
+    faults =  Fault::Event.count_by_fault_event(@current_user.domain.base,fault_device_type)
+    [{'location_type' => "正常热点数量", 'location_state' => sites - faults},
+      {'location_type' => "故障热点数量", 'location_state' => faults},
+      {'location_type' =>"热点总数", 'location_state' => sites}]
+  end
+  def location_room_off_point
+    sites = Area.count_by_repeaters(@current_user.domain.base)
+    faults =  Fault::Event.count_by_fault_event_repeaters(@current_user.domain.base)
+    [{'location_type' => "正常室分点数量", 'location_state' => sites - faults},
+      {'location_type' => "故障室分点数量", 'location_state' => faults},
+      {'location_type' =>"室分点总数", 'location_state' => sites}]
+  end
+
+  def device_stats
+    device_type=get_sql_detype(ap_alias=['a2'],ac_alias=['a3'],sw_alias=nil,port_alias=nil)
+    ap_type=get_sql_detype(ap_alias=['t1'],ac_alias=nil,sw_alias=nil,port_alias=nil)
+    domain = @current_user.domain
+    @domain_bdn = %r(%#{domain.base}).source
+    Avail::AvailDevice.device_statitic(@domain_bdn,device_type,ap_type)
+  end
+
+  def device_summary
+    #    if @display.include?("repeater_by_type")
+    fat_ap_count = Ap.count_by_sql "select count(*) from mit_aps where ap_fit = 2 and ap_dn like '%#{@domain_bdn}'"
+    fit_ap_count = Ap.count_by_sql "select count(*) from mit_aps where ap_fit = 1 and ap_dn like '%#{@domain_bdn}'"
+    discovered_ap_count = FitAp.count_by_sql "select count(*) from mit_fit_aps where ap_dn like '%#{@domain_bdn}'"
+    ac_count = Ac.count_by_sql "select count(*) from mit_acs where ac_dn like '%#{@domain_bdn}'"
+    switch_count = Sw.count_by_sql "select count(*) from mit_switchs where sw_dn like '%#{@domain_bdn}'"
+    repeater1 = Repeater.count_by_sql "select count(*) from mit_repeaters where repeater_type=1 and repeater_dn like '%#{@domain_bdn}'"
+    repeater2 = Repeater.count_by_sql "select count(*) from mit_repeaters where repeater_type=2 and repeater_dn like '%#{@domain_bdn}'"
+    repeater3 = Repeater.count_by_sql "select count(*) from mit_repeaters where repeater_type=3 and repeater_dn like '%#{@domain_bdn}'"
+    {:fat_ap_count => fat_ap_count,
+      :fit_ap_count => fit_ap_count,
+      :discovered_ap_count => discovered_ap_count,
+      :ac_count => ac_count,
+      :switch_count => switch_count,
+      :repeater1 => repeater1,
+      :repeater2 => repeater2,
+      :repeater3 => repeater3,
+    }
+    #    end
+  end
+
+  def new_default_row
+    return {"critical" => 0,
+      "major" => 0,
+      "minor" => 0,
+      "warning" => 0,
+      "indeterminate" => 0,
+      "clear" => 0,
+      "summary" => 0};
+  end
+
+  def get_alarm_type_by(key)
+    return "通信告警" if key == 'Communications'
+    return "环境告警" if key == 'Environmental'
+    return "设备告警" if key == 'Equipment'
+    return "性能阈值"  if key == 'Quality of Service'
+    return "非法操作" if key == 'Operational Violation'
+    key
+  end
+
+  def get_source_class_by(type)
+    return 'AP' if type.include? 'ossWirelessAccessPoint'
+    return 'SW' if type.include? 'ossIpSwitch'
+    return 'AC' if type.include? 'ossWirelessAccessController'
+  end
+end

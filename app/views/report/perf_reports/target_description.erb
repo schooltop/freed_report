@@ -1,0 +1,36 @@
+<% content_for :head do %>
+<% end %>
+<div id="content-wrap">
+  <div id="widebar">
+    <div id="widebar-inner" align="center">
+      <div id="widebar-content-wrap" style="width:70%">
+        <div style="font-size:30px;margin-top:0.6em;">
+          指标说明
+        </div>
+        <div id="widebar-content">
+          <div class="target_description">
+            <table class="ui-grid ui-widget ui-widget-content ui-corner-all ui-helper-reset" cellspacing="0" role="grid">
+              <thead>
+                <tr>
+                  <th>指标名称</th>
+                  <th>指标说明</th>
+                </tr>
+              </thead>
+              <tbody align="left">
+                <% @targets.each_with_index do |t,i| %>
+                  <tr class="ui-grid-even ui-grid-first">
+                    <td><%=t.name_cn.nil? ? '&nbsp' : t.name_cn %></td>
+                    <td><%=t.remark.nil? ? '&nbsp' : t.remark %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <div style="margin-top:0.5em;" class="clearfix">
+              <%=will_paginate @targets%>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

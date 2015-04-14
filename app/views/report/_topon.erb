@@ -1,0 +1,27 @@
+<fieldset style="padding: 5px;height:145px;" class="ui-widget-content ui-corner-all">
+  <legend>
+    <%=f.check_box :is_topn, :style => "", :id => "topn-enabled", :class => " topon_enabled"%>
+    <%=label "perf_template",:is_topn, "支持TopN", :for =>"topn-enabled", :style => ""%>
+  </legend>
+  <div style="" class="topn">
+    <div class="li">
+      <%=f.label :topn_kpi,'TopN指标', :class=>'label'%>
+      <%=f.select :topn_kpi, [],{}, {:style=>"width:228px;", :id => "topnkpi", :class => " topn topn-index"}%>
+    </div>
+    <div class="li">
+      <%=f.label :sort_type,'排序方式',:class=>'label'%>
+      <%=f.select :sort_type, [['升序', 1], ['降序', 2]],{:selected => @perf_template.sort_type}, {:style=>"width:228px;",:class =>' topn'}%>
+    </div>
+    <div class="li">
+      <%=f.label :top_n,'TopN值',:class=>'label'%>
+      <%=f.text_field :top_n, :style=>"width:220px;", :class=>' topn'%>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $(function(){
+      $(".topon_enabled").click(function(e){
+        $(".topn").attr("disabled", !$(e.target).attr("checked"));
+      })
+    })
+  </script>
+</fieldset>

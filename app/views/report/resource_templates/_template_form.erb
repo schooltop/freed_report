@@ -1,0 +1,193 @@
+<style type="text/css">
+  .form .col{
+    width:48%;
+  }
+  .form .label{
+    width:10.3%;
+  }
+  .form .text{
+    width: 87%;
+  }
+  .form .col .label{
+    width:20.5%;
+  }
+  .form .col .text{
+    width: 70%;
+  }
+  .form .col .select{
+    width: 72%;
+  }
+  .form fieldset{
+    margin-left: .5em;
+    margin-right: .5em;
+  }
+  .category-option{
+    display : none;
+  }
+  select{
+    height: 21px;
+    vertical-align:middle;
+  }
+  .group-condition{
+    float:left;
+    width:90px
+  }
+</style>
+<script type="text/javascript">
+  function checkDicGroup(){
+    var checkedGroups = "<%=@perf_template.dic_group.is_a?(Array) ? @perf_template.dic_group.uniq.join(",") : @perf_template.dic_group%>".split(",");
+    $.each(checkedGroups, function(i, group){
+      if(group != "")
+        $("#" + group).attr("checked", true);
+    });
+  }
+  function cancelUsers(){
+    $("#perf_template_report_template_users option").attr("selected", false);
+  }
+
+  $(function(){
+    checkDicGroup();
+    $(".cancelusers").click(function(e){
+      cancelUsers();
+    });
+  });
+</script>
+<script type="text/javascript">
+  $(function(){
+    acOption = $("#device_class").find("option").eq("2");
+    $("#region_gran").change(function(){loadDeviceSelect();});
+  });
+  
+  function loadDeviceSelect(){
+    var deviceSelect = $("#device_class");
+    var regionVal = parseInt($("#region_gran").val());
+    acOption.remove();
+    if(regionVal != 5){
+      acOption.insertBefore("#device_class> option:last-child")
+      }
+  };
+</script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    if (parseInt($("#group_type").val()) != 2){
+      $("#category_id").attr("disabled", true);
+      };
+    loadGroupTypeSelect();
+  });
+  function loadGroupTypeSelect(){
+    var groupType = $("#group_type");
+    groupType.change(function(){
+      var groupValue = parseInt(groupType.val());
+      switch(groupValue){
+        case 1:
+          categorySelectSetNone();
+          break;
+        case 2:
+          categorySelectReset();
+          break;
+        case 3:
+          categorySelectSetNone();
+          break;
+      }
+    });
+  };
+  function categorySelectReset(){
+    var category = $("#category_id"); 
+    category.attr("disabled", false);
+    category.attr("value", "");
+  };
+  function categorySelectSetNone(){
+    var category = $("#category_id"); 
+    category.attr("value", "");
+    category.attr("disabled", true);
+  };
+</script>
+
+<% form_for :perf_template, @perf_template, :url => url, :html => {:method => method, :class => 'form ui-widget'} do |f| -%>
+  <input type="hidden" name="perf_template[report_type]" value="4">
+  <%= ui_error f.error_messages unless f.error_messages.empty? %>
+  <% field_set_tag '', :style => "padding: 1em;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class='wrap'>
+      <div class='li'>
+        <%=f.label 'name', '模板名称', :required=>true %>
+        <%=f.text_field :report_name, :style => "width:85%" %>
+      </div>
+	  <div class='li'>
+        <div class='left col' style="margin-left: 3px;">
+          <%=f.label :group_type,'报表类型',:class=>'label' %>
+          <%=f.select :group_type, @group_types, {:selected => @perf_template.group_type.to_s}, {:id => "group_type"}%>
+        </div>
+        <div class='left col' style="margin-left:10px;">
+          <%=f.label 'netloc_gran','区域粒度',:class=>'label', :required => true %>
+          <%=f.select :netloc_gran, [["省份", 0],["地市", 1],["郊县", 2],
+            ["热点", 5]], {}, {:id => "region_gran"}%>
+        </div>
+	  </div>
+	  <div class='li'>
+        <div class='left col' style="margin-left: 3px;">
+          <% @perf_template.time_define||=2%>
+          <%=f.label :time_define,'时间范围',:class=>'label' %>
+          <%=f.select :time_define, [""] + template_time_types, {:selected => @perf_template.time_define.to_i}, {:id => "time_define"}%>
+        </div>
+        <div class='left col' style="margin-left:10px;">
+          <%=f.label :category_id, '所属分类', :class=>'label'%>
+          <%=f.select :category_id, [""] + @template_catetory, {:selected => @perf_template.category_id.to_i}, {:id => "category_id"}%>
+        </div>
+	  </div>
+      <div class="li">
+        <div class='left col' style="margin-left: 3px;">
+          <%=f.label :device_class,'设备类型',:class=>'label' %>
+          <%=f.select :device_class, @device_types + [""] , {:selected => @perf_template.device_class.to_s}, {:id => "device_class"}%>
+        </div>
+      </div>
+      <div class='li'>
+        <div class='left col' style="margin-left:10px;">
+          <% field_set_tag '统计范围', :style => "padding: 5px;", :class => "ui-widget-content ui-corner-all" do %>
+            <%=render :partial=>'report/domain_selection'%>
+          <%end%>
+          <input type="hidden" name="perf_template[netloc]" id="netloc" value="<%=net_loc%>">
+        </div>
+        <div class="left col">
+          <% field_set_tag '模板用户<a style="cursor: hand;" class="cancelusers">(不选择用户)</a>', :style => "padding: 5px;", :class => "ui-widget-content ui-corner-all" do %>
+            <%=f.select :report_template_users, @all_users.map{|user| [user.name, user.id]}, {:selected => @perf_template.report_template_users.collect{|user|user.user_id}},  {:multiple => true, :style => "height:145px;width:95%;margin-left:2.5%;border:none;"}%>
+          <%end%>
+        </div>
+      </div>
+      <div class="li">
+        <div class="left col">
+          <%=f.label 'netloc_gran','分组条件',:class=>' label left' %>
+          <div class="left" style="width:75%">
+            <div class="group-condition">
+              <input id="device_manu" type="checkbox" value="device_manu" name="perf_template[dic_group][]" style="float:left">
+              <label for="device_manu" class="label" style="width:60px;">设备厂家</label>
+            </div>
+            <div class="group-condition">
+              <input id="device_type" type="checkbox" value="device_type" name="perf_template[dic_group][]" style="float:left">
+              <label for="device_type" class="label" style="width:60px;">设备类型</label>
+            </div>
+            <div class="group-condition">
+              <input id="device_state" type="checkbox" value="device_state" name="perf_template[dic_group][]" style="float:left">
+              <label for="device_state" class="label" style="width:60px;">使用状态</label>
+            </div>
+            <div class="group-condition">
+              <input id="port_type" type="checkbox" value="port_type" name="perf_template[dic_group][]" style="float:left">
+              <label for="port_type" class="label" style="width:60px;">热点类型</label>
+            </div>
+            <div class="group-condition">
+              <input id="device_kind" type="checkbox" value="device_kind" name="perf_template[dic_group][]" style="float:left">
+              <label for="device_kind" class="label" style="width:60px;">设备型号</label>
+            </div>
+            <div class="group-condition">
+              <input id="soft_ver" type="checkbox" value="soft_ver" name="perf_template[dic_group][]" style="float:left">
+              <label for="soft_ver" class="label" style="width:60px;">软件版本</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='li' align="center">
+        <%= f.submit "确定", :name => nil %>
+        <%= link_button_to "取消", {:action => 'index'} %>
+      </div>
+    </div>
+  <%end%>
+<%end%>

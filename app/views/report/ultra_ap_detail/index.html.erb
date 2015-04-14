@@ -1,0 +1,50 @@
+<% content_for :head do %>
+<% end %>
+<% content_for :header_title, "AP详细信息"%>
+<%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+<div class="control clearfix">
+  <ul class="ul export-box">
+    <li><%= export_to 'csv', "CSV", params %></li>
+  </ul>
+</div>
+<%
+sort_url = params.merge({:page => nil})
+%>
+<div  id="devices_grid">
+ <% form_tag(url_for(:action => 'show'), :method=>:get) do%>
+    <%=hidden_field_tag '_method', ''%>
+    <% ui_grid_for @grid ,:scrollable =>false do |g, cols, data| %>
+      <% g.head do %>
+        <% g.r do %>
+          <%= g.format_sort(:serial,"序号", :html => {:width => nil}) %>
+          <%= g.format_sort(:apcn,"名称", :html => {:width => nil}) %>
+          <%= g.format_sort(:ip,"IP地址", :html => {:width => nil}) %>
+          <%= g.format_sort(:citycn,"所属地市", :html => {:width => nil}) %>
+          <%= g.format_sort(:accn,"所属AC", :html => {:width => nil}) %>
+          <%= g.format_sort(:portcn,"归属热点", :html => {:width => nil}) %>
+          <%= g.format_sort(:ap_back,"对应AP退服率(上月)", :html => {:width => nil}) %>
+          <%= g.format_sort(:liuliang,"对应AP日流量", :html => {:width => nil}) %>
+        <% end %>
+      <% end %>
+      <% g.body do %>
+        <% if data.size >0 %>
+          <% data.each do |d| %>
+            <% g.r do %>
+              <%=g.d d[:serial].to_i%>
+              <%=g.d d[:apcn]%>
+              <%=g.d d[:ip]%>
+              <%=g.d d[:citycn]%>
+              <%=g.d d[:accn]%>
+              <%=g.d d[:portcn]%>
+              <%=g.d d[:ap_back].nil? ? 0.0:d[:ap_back]%>
+              <%=g.d d[:liuliang].nil? ? 0.0:d[:liuliang]%>
+            <% end %>
+          <% end %>
+        <% else %>
+          <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+        <% end %>
+      <% end %>
+    <% end %>
+    <%end%>
+</div>
+<%= bottom_show @ap_detail%>

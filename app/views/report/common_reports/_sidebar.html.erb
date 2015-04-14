@@ -1,0 +1,9 @@
+<div id="sidebar">
+    <% ui_menubar :id =>'menu' do |m| %>
+    <%m.menu '其它常用报表' do %>
+    <%@relative_templates.each do |template| %>
+    <%=m.item template.report_name, template.report_name,{:controller => 'report/common_reports', :action => :show, :id => template.id} %>
+    <%end unless @relative_templates.nil? %>
+    <%end %>
+    <%end %>
+</div>

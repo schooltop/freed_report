@@ -1,0 +1,192 @@
+<% content_for :head do %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.cluetip' %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.hoverIntent.js' %>
+  <%=javascript_include_tag 'ui/external/bgiframe/jquery.bgiframe.min'%>
+  <%=javascript_include_tag 'ui/ui/jquery.multiSelect'%>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <%=javascript_include_tag "ui/external/cookie/jquery.cookie.js"%>
+  <%=javascript_include_tag "ui/external/dynatree/jquery.dynatree.js"%>
+  <%=stylesheet_link_tag 'ui/ui/jquery.multiSelect'%>
+  <%=stylesheet_link_tag "/javascripts/ui/external/dynatree/skin/ui.dynatree.css"%>
+  <%=stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js"%>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js"%>
+  <style type="text/css">
+    .changed {
+      background: yellow
+    }
+    .cluetip-jtip h3#cluetip-title {
+      background-color:#D0E3EF;
+    }
+    .cluetip-jtip #cluetip-inner{
+      display:block;
+    }
+    .net_type {
+      width: 77px;
+    }
+    .multiSelect {
+      background:url("/images/multi_selection/dropdown.gif") no-repeat scroll right center #FFFFFF;
+      border:1px solid #7B9EBD;
+      cursor:default;
+      display:inline;
+      padding:1px 20px 3px 3px;
+      position:relative;
+    }
+
+    #dataSelect {
+      font-size: 1.2em;
+    }
+  </style>
+  <script type="text/javascript">
+    function conditionChanged(ev){
+      var current_value = ev.target.value;
+      var el = $(ev.target);
+      var original_value = el.attr('original_value');
+      var all_guide = $('.control .all_guide');
+      if(original_value != current_value){
+        el.addClass("changed");
+        all_guide.attr("disabled", true);
+        el.attr("title", "当前属性已经改变，必须重新查询");
+        all_guide.addClass("ui-state-disabled");
+      }else{
+        el.removeClass("changed");
+        all_guide.attr("disabled", false);
+        el.attr("title", "");
+        all_guide.removeClass("ui-state-disabled");
+      }
+    }
+
+    $(function(){
+      <%#*$("#region-condition").submit(function(e){%>
+        <%#*$("#submit").val("分析中").attr("disabled", true);%>
+      <%#*});%>
+      $("#begin_time").datepicker($.extend({}, $.datepicker.regional["zh-CN"], {
+        showStatus: true
+      }));
+      $(".control input[type=text],select").change(conditionChanged);
+
+      //纬度分析
+      var defSelect = $('.time_range').attr("value");
+      if(defSelect == 3){
+        $('.advanced').hide();
+        $("#dataSelect").show();
+      }
+      else if(defSelect == 2){
+        $('.advanced').show();
+        $(".advanced #week").show();
+        $("#dataSelect").hide();
+        loadTime();
+      }
+      else if(defSelect == 1){
+        $('.advanced').show();
+        $(".advanced #week").hide();
+        loadTime();
+        $(".advanced #week input:checked").attr("checked", false);
+      }
+      else{
+        $('.advanced').hide();
+        $("#dataSelect").hide();
+      }
+      $('.time_range').change(function(item){
+        var select = item.target.value;
+        if(select == 1 || select == 2){
+          $('.advanced').slideDown();
+          $(".advanced input:checked").attr("checked", "");
+          $("#dataSelect").slideUp();
+          loadTime();
+          if(select == 2){
+            $(".advanced #week").show();
+          }
+          else{
+            $(".advanced #week").hide();
+            $(".advanced #week input:checked").attr("checked", false);
+          }
+        }
+        else if(select == 3){
+          $('.advanced').slideUp();
+          $("#dataSelect").slideDown();
+        }
+        else {
+          $('.advanced').slideUp();
+          $("#dataSelect").slideUp();
+        }
+      });
+      function loadTime(){
+  <% unless params[:year].nil? %>
+        $("#year").find("input[value=<%= params[:year] %>]").attr("checked", true);
+  <% end %>
+  <% unless params[:month].nil? %>
+        $("#month").find("input[value=<%= params[:month] %>]").attr("checked", true);
+  <% end %>
+    };
+  });
+  </script>
+<% end %>
+<%content_for :header_title do %>
+  全省WLAN业务PortalRadius性能报表(月报)
+<%end %>
+
+<div>
+ <%form_tag(url_for(:action=>'wlan_portal_radius_pref'), :method => "get", :method=>"get") do %>
+  <div>
+    <div id="control" class="control clearfix">
+      <%=hidden_field_tag :area_level, 2, :id=>'area_level' %>
+      <%=hidden_field_tag :net_type_key, params[:net_type_key]%>
+      <span style="float:left;margin-right:5px;margin-left:5px;margin-top:3px;"><%=ultra_time_range%></span>
+      <span style="float:left;margin-right:5px;"><%=hidden_field_tag :saved_time_range_text, params[:saved_time_range_text]%></span>
+      <span style="float:left;margin-right:5px;"><%=hidden_field_tag :saved_time_range_value, params[:saved_time_range_value]%></span>
+      <span style="float:left;margin-left:2px;"><%=submit_tag '确定',:name=>nil, :id => "submit"%></span>
+      <%if @grid%>
+        <ul class="ul export-box f5">
+          <li><%= export_to 'csv', "CSV",params%></li>
+        </ul>
+      <% end %>
+    </div>
+    <div id="dataSelect" style="display:none">
+      <%field_set_tag "自定义时间范围", :class => "ui-widget-content ui-corner-all" do %>
+        <%=rms_begin_time %>
+        <%#=end_time %>
+      <%end%>
+    </div>
+    <%=render :partial => 'report/advanced',:locals => {:account => @years,:type=>3}%>
+ <%end%>
+</div>
+  <%
+  sort_url = params.merge({:page => nil})
+%>
+   <div id="showdata" class="form">
+    <% ui_grid_for @grid,:scrollable =>false do |g,cols,data|%>
+    <%g.head do %>
+      <%g.r do%>
+                   <%= g.format_sort(:sampledate,"统计时间", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:nodecn,"省份", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:regist_num,"PortalRadius的注册用户数(个)", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:active_num,"PortalRadius的活跃用户数(个)", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:req_time,"PortalRadius认证请求数(次)", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:fee_time,"计费时长(min)", :html => {:width => nil}, :url =>sort_url) %>
+                   <%= g.format_sort(:flow,"计费流量(GB)", :html => {:width => nil}, :url =>sort_url) %>
+    <%end%>
+   <%end%>
+    <%g.body do%>
+      <% if data.size >0 %>
+        <% data.each do |d| %>
+          <% g.r do %>
+                    <%=g.d d[:sampledate].nil? ? "":d[:sampledate].strftime("%Y-%m-%d")%>
+                    <%=g.d d[:nodecn]%>
+                    <%=g.d d[:regist_num].to_i%>
+                    <%=g.d d[:active_num].to_i%>
+                    <%=g.d d[:req_time].to_i%>
+                    <%=g.d d[:fee_time]%>
+                    <%=g.d d[:flow]%>
+            <%end%>
+        <% end %>
+      <%else%>
+        <%g.r do%>
+          <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+        <%end%>
+      <%end%>
+    <%end%>
+  <%end%>
+</div>
+</div>
+  <%= bottom_show @portal_data %>

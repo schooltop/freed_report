@@ -1,0 +1,9 @@
+.ui-pagination{
+  padding:0.2em 0;
+  text-align:right;
+}
+.ui-pagination a, .ui-pagination span {
+   position: relative;
+   padding:0.2em 0.6em;
+   vertical-align: text-top;
+}

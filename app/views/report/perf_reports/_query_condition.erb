@@ -1,0 +1,25 @@
+<% field_set_tag '自定义分析条件', :style => "padding: 5px;margin-bottom:5px;", :class => " f4 ui-widget-content ui-corner-all" do %>
+  <%params[:netloc_cns] = "全部区域" if params[:netloc_cns].nil? || params[:netloc_cns].empty?%>
+  <%@perf_template.hourlist = "全部时段" if @perf_template.hourlist.nil? || @perf_template.hourlist.empty?%>
+  <div id="conditions" style="display:none;">
+    <%if params[:reporttype] == 1%>
+      <%=render :partial => '/report/perf_reports/perf_condition'%>
+    <%elsif params[:reporttype] == 2%>
+      <%=render :partial => '/report/perf_reports/alarm_condition'%>
+    <%elsif params[:reporttype] == 3%>
+      <%=render :partial => '/report/perf_reports/case_condition'%>
+    <%elsif params[:reporttype] == 4%>
+      <%=render :partial => '/report/perf_reports/resource_condition'%>
+    <%end%>
+    <div style="margin-top:5px;">
+      <div class="right ui-icon ui-icon-carat-1-n"></div>
+      <a href="#" class="right" id="collapse" style="margin-left:10px;">折叠条件框</a>
+      <a class="right" href="/report/perf_reports?reporttype=<%=params[:reporttype]%>" style="margin-left:10px;">新建自定义分析</a>
+      <a href="#" id="edit-condition" class="right">编辑条件</a>  
+    </div>
+  </div>
+  <div id="expand" style="display:block;">
+    <div class="right ui-icon ui-icon-carat-1-s"></div>
+    <a href="#" class="right" id="expand-action">展开条件框</a>
+  </div>
+<%end%>

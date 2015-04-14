@@ -1,0 +1,27 @@
+﻿<div id="sidebar">
+ <%=render :partial=>"/layouts/sitetree"%>
+  <% ui_menubar :id =>'menu' do |m| %>
+    <% m.menu '前置报表模版' do %>
+     <%=m.item 'common_report','编写SQL模版列表',{:controller => 'ultra/ult_report_models',:action => 'index'}, :class =>controlled("ultra/ult_report_models/index") %>
+     <%#=m.item 'alarm_report','SQL模版配置',{:controller => 'ultra/ult_report_models',:action => 'new'}, :class =>controlled("ultra/ult_report_models/new") %>
+     <%=m.item 'perf_templates','手动配置模版列表',{:controller => 'ult_report/perf_templates',:action => 'index'}, :class =>controlled("ult_report/perf_templates/index") %>
+     <%#=m.item 'alarm_report','手动模版配置',{:controller => 'ult_report/perf_templates',:action => 'new'}, :class =>controlled("ult_report/perf_templates/new") %>
+    <%end %>
+    
+  <%end %>
+</div>
+<script>
+  function countall(){
+    //统计指标-全部
+    $("#kiplist option").attr("selected", "selected");
+    $("#kiplist").change();
+    $(".countall").replaceWith('<a  style="cursor: hand;"  class="discountall" onclick="discountall();">(取消全选)</a>');
+  }
+
+  function discountall(){
+    //统计指标-取消全部
+    $("#kiplist option").removeAttr("selected");
+    $("#kiplist").change();
+    $(".discountall").replaceWith('<a  style="cursor: hand;" onclick="countall();"  class="countall">(全选)</a>');
+  }
+</script>

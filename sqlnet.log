@@ -1,0 +1,266 @@
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 09-MAY-2013 10:33:27
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-MAY-2013 16:49:55
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-MAY-2013 17:51:47
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 28-JUN-2013 11:12:02
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 28-JUN-2013 11:20:44
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 26-SEP-2013 14:53:16
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:57:30
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:58:33
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:58:38
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:58:49
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:58:52
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12537, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.100.151)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ydwg)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 24-JAN-2014 16:59:07
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12537
+    TNS-12537: TNS:connection closed
+    ns secondary err code: 12560
+    nt main err code: 507
+    TNS-00507: Connection closed
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12533, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=))(CONNECT_DATA=(SERVICE_NAME=)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 19-FEB-2014 11:51:33
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12533
+    TNS-12533: TNS:illegal ADDRESS parameters
+    ns secondary err code: 12560
+    nt main err code: 503
+    TNS-00503: Illegal ADDRESS parameters
+    nt secondary err code: 0
+    nt OS err code: 0
+
+
+***********************************************************************
+Fatal NI connect error 12533, connecting to:
+ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=))(CONNECT_DATA=(SERVICE_NAME=)(SERVER=DEDICATED)(CID=(PROGRAM=d:\ruby187\bin\ruby.exe)(HOST=OEM-20121225CKY)(USER=Administrator))))
+
+  VERSION INFORMATION:
+	TNS for 32-bit Windows: Version 10.1.0.2.0 - Production
+	Windows NT TCP/IP NT Protocol Adapter for 32-bit Windows: Version 10.1.0.2.0 - Production
+  Time: 19-FEB-2014 11:52:21
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12533
+    TNS-12533: TNS:illegal ADDRESS parameters
+    ns secondary err code: 12560
+    nt main err code: 503
+    TNS-00503: Illegal ADDRESS parameters
+    nt secondary err code: 0
+    nt OS err code: 0

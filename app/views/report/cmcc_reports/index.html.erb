@@ -1,0 +1,43 @@
+<% content_for :head do %>
+  <style type="text/css">
+      .template_group {
+          font-weight: bold;
+          padding: 2px 0 0 0;
+      }
+      .template_group image, .template image {vertical-align: middle;}
+  </style>
+<%end %>
+<%content_for :header_title do %>集团报表<%end %>
+<table width="100%">
+    <tr>
+        <%@template_categories.each do |category| %>
+        <td width="33%" valign="top">
+            <div class="board ui-widget">
+                <h4 class="board-header ui-widget-header ui-corner-top"><%=category.name %></h4>
+                <div class="board-content ui-widget-content ui-corner-bottom" style="vertical-align:top;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="template_group">
+                            	<%=image_tag "default/tree/elbow-end-minus-nl.gif"%>所有集团<%=category.name %>
+                            </td>
+                        </tr>
+                    
+                        <%category.find_templates.each do |template| %>
+                        <tr>
+                            <td class="template">
+                            	<%=image_tag "default/tree/elbow.gif"%><%=image_tag "default/tree/leaf.gif"%>
+                                <%=link_to template.report_name, {:controller => :cmcc_reports, :action => :show, :id => template.id }, :popup => true%>
+                            </td>
+                        </tr>
+                        <%end %>
+                    </table>
+                </div>
+            </div>
+        </td>
+        <%end %>
+    </tr>
+    <tr>
+       <td width="35%" valign="top"></td>
+    </tr>
+</table>
+

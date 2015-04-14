@@ -1,0 +1,14 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  hello: "Hello world"
+
+  human_names:
+    ap:
+      ap_fit:
+        "1": "瘦"
+        "2": "胖"
+      ap_state:
+        "0": "正常"
+        "1": "采集中"

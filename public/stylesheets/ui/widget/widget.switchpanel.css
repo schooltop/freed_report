@@ -1,0 +1,49 @@
+/* switchpanel
+----------------------------------*/
+.ui-switchpanel {
+        zoom: 1;
+}
+.ui-switchpanel .ui-switchpanel-nav {
+        list-style: none;
+        position: relative;
+}
+.ui-switchpanel .ui-switchpanel-nav li {
+
+        display:inline;
+        position: relative;
+        float: right;
+        border-top-width: 0 !important;
+        margin: 0 0 -1px .6em;
+        padding: 0;
+ }
+ .ui-switchpanel .ui-switchpanel-nav li .ui-icon{
+
+         display:-moz-inline-stack;
+         vertical-align:top;
+         display:inline-block;
+         height:1em;
+}
+.ui-switchpanel .ui-switchpanel-nav li a {
+        text-decoration: none;
+        float:left;
+        padding:.2em .3em;
+
+}
+.ui-switchpanel .ui-switchpanel-nav li.ui-switchpanel-selected {
+        margin-top: -1px;
+        border-top-width: 0;
+ }
+ .ui-switchpanel .ui-switchpanel-nav li.ui-switchpanel-selected a, .ui-switchpanel .ui-switchpanel-nav li.ui-state-disabled a, .ui-switchpanel .ui-switchpanel-nav li.ui-state-processing a {
+         cursor: ;
+ }
+ .ui-switchpanel .ui-switchpanel-nav li a, .ui-switchpanel.ui-switchpanel-collapsible .ui-switchpanel-nav li.ui-switchpanel-selected a {
+         cursor: pointer;
+ } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+ .ui-switchpanel .ui-switchpanel-panel {
+         border-top-width:0;
+         padding: 1em 1.4em;
+         display: block;
+ }
+ .ui-switchpanel .ui-switchpanel-hide {
+         display: none;
+ }

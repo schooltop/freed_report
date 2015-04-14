@@ -1,0 +1,16 @@
+<div>统计时段：<%=@perf_template.hourlist%></div>
+<div style="margin-top:5px;">统计范围：<%=params[:netloc_cns]%></div>
+<div class="clearfix" style="margin-top:5px;">
+  <div style="width:180px" class="left">时间粒度：<%=time_gran_text(@perf_template.time_gran)%></div>
+  <div style="width:180px" class="left">忙时选项：<%=busytime_text(@perf_template.busytime)%></div>
+  <div style="width:180px" class="left">专案粒度：<%=netloc_grans_case_text(@perf_template.netloc_gran)%></div>
+  <%unless @perf_template.kpilist.nil?%>
+    <div style="width:180px" class="left">统计指标：<%=@perf_template.kpilist.split(",").length%>个</div>
+  <%end%>
+</div>
+<div class="clearfix" style="margin-top:5px;">
+  <div style="width:180px" class="left">TopN支持：<%=(!@perf_template.is_topn.nil? && @perf_template.is_topn == 1) ? "是" : "否"%></div>
+  <div style="width:180px" class="left">TopN指标：<%=!@perf_template.is_topn.nil? ? @perf_template.topn_kpi : "无"%></div>
+  <div style="width:180px" class="left">排序方式：<%=!@perf_template.is_topn.nil? ? sort_type_text(@perf_template.sort_type) : "无"%></div>
+  <div style="width:180px" class="left">TopN值：<%=!@perf_template.is_topn.nil? ? @perf_template.top_n : "无"%></div>
+</div>

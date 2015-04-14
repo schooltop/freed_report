@@ -1,0 +1,2 @@
+module Report::UltraApDetailHelper
+end

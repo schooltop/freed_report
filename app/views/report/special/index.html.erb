@@ -1,0 +1,56 @@
+<% content_for :head do %>
+	<%= stylesheet_link_tag "ext-all" %>
+	<%= stylesheet_link_tag "ext/multiselect" %>
+	<%= stylesheet_link_tag "ext/tree_icons"%>
+	
+	<%= javascript_include_tag "extjs/ext-base" %>
+	<%= javascript_include_tag "extjs/ext-all" %>
+	<%= javascript_include_tag "extux/DDView" %>
+	<%= javascript_include_tag "extux/Multiselect" %>
+	<%= javascript_include_tag "extux/TreeField" %>
+	<%= javascript_include_tag "extux/CheckCombo" %>
+	<%= javascript_include_tag "extux/CheckHour" %>
+	<%= javascript_include_tag "ext-add" %>
+	<%= javascript_include_tag "resource_zh" %>
+	<%= javascript_include_tag "rmsport/CaseManage" %>
+	<%= javascript_include_tag "webport/SimpleGrid" %>
+<% end %>
+<div id="nav">
+  <% ui_menubar :id =>'menu' do |m|%>
+    <%m.menu '报表管理' do%>
+      <%=m.item 'common_report','常用报表',{:controller => 'report/common_reports', :id => nil} %>
+      <%=m.item 'cmcc_report','集团报表',{:controller => 'report/cmcc_reports', :id => nil} %>
+      <%=m.item 'perf_report','性能报表',{:controller => 'report/perf_reports',:reporttype=>'1', :id => nil},:class =>controlled("report/perf_reports/index") %>
+      <%=m.item 'case_report','专案报表',{:controller => 'report/perf_reports', :action => "index",:reporttype=>'3', :id => nil},:class =>controlled("report/perf_reports/index")  %>
+      <%=m.item 'alarm_report','告警报表',{:controller => 'report/perf_reports',:reporttype=>'2', :id => nil},:class =>controlled("report/perf_reports/index")  %>
+      <%=m.item 'resource_report','资源报表',{:controller => 'report/perf_reports',:reporttype=>'4', :id => nil},:class =>controlled("report/perf_reports/index")  %>
+      <%=m.item 'convenient_report','一键式报表',{:controller => 'report/perf_reports',:action => 'convenient_report', :id => nil},:class =>controlled("report/perf_reports/convenient_report")  %>
+    <%end%>
+	<%if $SUPPORT_RADIUS_REPORT%>
+      <% m.menu 'Radius 统计报表' do %>
+        <%=m.item 'ac_auth','AC认证情况统计',{:controller => 'report/radius_reports', :type => 1, :report_name => "ac_auth"}%>
+        <%=m.item 'auth_failure','认证失败其它情况统计',{:controller => 'report/radius_reports', :type => 2, :report_name => "auth_failure"}%>
+        <%=m.item 'portal_auth','PORTAL整体认证统计',{:controller => 'report/radius_reports', :type => 3, :report_name => "portal_auth"}%>
+        <%=m.item 'mml_protocol','MML协议通讯情况统计',{:controller => 'report/radius_reports', :type => 4, :report_name => "mml_protocol"}%>
+        <%=m.item 'portal_protocol','PORTAL协议通讯统计',{:controller => 'report/radius_reports', :type => 5, :report_name => "portal_protocol"}%>
+      <%end %>
+    <%end%>
+    
+    <% m.menu '模板管理' do%>
+      <%=m.item 'perf_templates','性能报表模板',{:controller => 'report/perf_templates'},:class =>controlled("report/perf_templates/index") %>
+      <%=m.item 'case_templates','专案报表模板',{:controller => 'report/case_templates'},:class =>controlled("report/case_templates/index") %>
+      <%=m.item 'alarm_templates','告警报表模板',{:controller => 'report/alarm_templates'},:class =>controlled("report/alarm_templates/index") %>
+      <%=m.item 'resource_templates','资源报表模板',{:controller => 'report/resource_templates'},:class =>controlled("report/resource_templates/index") %>
+    <%end%>
+    <% m.menu '专案管理' do%>
+      <%=m.item 'special','专案管理',{:controller=>'report/special'},:class =>controlled("report/special/index") %>
+    <%end%>
+  <%end%>
+</div>
+<div id='case-tree'></div>
+<div id='case-grid'></div>
+<script type="text/javascript">
+  Ext.onReady(function(){
+   opengoss.rmsport.caseManage = new opengoss.rmsport.CaseManage(<%= @config %>);
+  });
+</script>

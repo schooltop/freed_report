@@ -1,0 +1,70 @@
+<style type="text/css">
+  div#unused a {
+    color: #ffffff;
+    font-weight: bold;
+  }
+  #navigation LI {
+    line-height: 10px;
+    margin-bottom:20px;
+}
+  .current a{
+   color: #ffffff;
+   background: url(/stylesheets/themes/ultrapower/images2/menu_current2.jpg) repeat-x;
+}
+   #timertab li a{
+   margin-left: 20px;
+   padding-left:5px;
+   padding-right:5px; 
+}
+</style>
+<%=stylesheet_link_tag "crm-style",'deprecated','colors.sugar' %>
+<!--header-->
+<div id="header" class="ui-toolbar">
+  <div id="header-inner" class="clearfix">
+    <div id="navbar" style="width: 100% !important;">
+      <div id="subnav" class="clearfix">
+        <div id="unused">
+          <span style="padding-left:6px;"></span>
+          <%if @current_user %><%=link_to @current_user.name, :controller => '/personal' %>
+            <span class="pipe">|</span>
+          <%end %>
+          <%= link_to t('help'), "/WlanHelp/WLAN_HELP.htm", :target => "_blank"%>
+          <!--<%=link_to t('help'), '/help' %><span class="pipe">|</span> -->
+        </div>
+        <%#*<div id="eventbox-container" style="float:right">%>
+          <%# %w(critical major minor warning indeterminate clear).each do|severity| %>
+            <%#=eventbox(severity, 0) %>
+          <%#end %>
+        <%#*</div>%>
+      </div>
+      <div id="navigation-wrap">
+        <ul id="navigation" class="ul clearfix">
+          <% @current_menuitems.each do |m| %>
+            <% m.modelname==session[:sys_tab] ? current_class="ui-corner-top ui-state-active" : current_class=""%>
+          <li class="<%=current_class%>"><a href="/<%=m.url%>" ><%=m.name%></a></li>
+            <li><%=image_tag "menu_line.png", :style => "height: 26px;"%></li>
+          <% end %>
+        </ul>
+      </div>
+       
+      <div id="basic-search">
+        <% form_for  :ap_q, :url =>{:controller=>'inventory/search'}, :html =>{:method=>:get } do |f| -%>
+          <span id="basic-search-wrap" class="ui-input ui-corner-all">
+            <label class="ui-icon ui-icon-search" for="basic-search-q"> </label>
+            <input id="basic-search-q" type="text" name="search_condition" value="<%=params[:search_condition]%>" title="请输入搜索条件..." class="text ui-placeholder"/></span>
+          <% end -%>
+      </div>
+
+      <%#*<div id="navigation-wrap">%>
+         <%#*<ul id="timertab" class="ul clearfix" style="padding-top: 4px ; background: url(/stylesheets/themes/ultrapower/images2/content_title_bg.png) repeat-x;"  >%>
+          <%#*<li class="noBorder"></li>%>
+      <%#=sys_title_select :all,"hi?st=0","0",:style=>"width:100px"%>
+      <%#=sys_title_select :perfict,"hi?st=1","1"%>
+      <%#=sys_title_select :reservice,"hi?st=2","2"%>
+        <%#*</ul>%>
+      <%#*</div>%>
+      
+    </div>
+  </div>
+</div>
+<!--header end-->

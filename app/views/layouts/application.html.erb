@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xml:lang="<%=I18n.locale%>" lang="<%=I18n.locale%>">
+  <%=render :partial=>'layouts/head'%>
+  <body class="<%=controller.controller_name%>">
+    <div id="wrapper" class="ui-layout">
+       <%=render :partial=>'layouts/header'%>            
+    <%
+      sidebar ||= render :partial => ('/layouts/siteleft') unless self.controller_name== 'dashboard'
+      screen_meta = yield :screen_meta
+      screen_meta ||= render :partial=>'screen_meta' if partial_exist?(controller.class.controller_path, 'screen_meta')
+    %>
+       
+      <div id="content-wrap2" class="clearfix">
+        <div id="content-wrap">
+
+
+<script type="text/javascript">
+  function GetCurrentStyle (obj, prop,num) {
+     if (obj.currentStyle) {
+     if (num==0) {
+     document.styleSheets[0].cssText=document.styleSheets[0].cssText.replace(/19em/g,"1em");
+     }
+     else {
+     document.styleSheets[0].cssText=document.styleSheets[0].cssText.replace(/1em/g,"19em");
+     }
+   }
+     else if (window.getComputedStyle) {
+     if (num==0) {
+     document.styleSheets[0].cssRules[0].style.cssText=document.styleSheets[0].cssRules[0].style.cssText.replace(/19em/g,"0em");
+     }
+     else {
+    document.styleSheets[0].cssRules[0].style.cssText=document.styleSheets[0].cssRules[0].style.cssText.replace(/0em/g,"19em");
+     }
+     }
+     return null;
+}    
+function showSiterbar(){
+    var b=document.getElementById('leftColumn')
+    var c=document.getElementById('content')
+if(b.style.display=="block"){
+     GetCurrentStyle(c,"margin-left",0);    
+     b.style.display="none";
+}else{
+   GetCurrentStyle(c,"margin-left",1);
+   b.style.display="block";
+}
+}
+</script>
+
+
+
+             
+              <div id="content" class="clearfix <%='has-sidebar' unless sidebar.nil? %> <%='has-screen-meta' unless screen_meta.nil? %>">
+             <% unless sidebar.nil? %>
+                <%=sidebar%>
+                <div style="z-index:200;margin-top:120px;float:left;"><img id='HideHandle' name='HideHandle' src='/images/crm/hide.gif' alt='' onclick="showSiterbar()" /></div>
+            <% end %>
+             <div id="widebar">
+              <% unless screen_meta.nil? %>
+                <%=screen_meta%>
+              <% end %>
+              <div id="widebar-inner">
+                <% header_title = yield :header_title %>
+                <% if header_title %>
+                  <div id="widebar-content-wrap">
+                    <div id="header-title-wrap">
+                      <h1 id="header-title">
+                        <%= header_title %>
+                      </h1>
+                    </div>
+                    <div id="widebar-content">
+                      <%=yield%>
+                    </div>
+                  </div>
+                <% else %>
+                  <%=yield%>
+                <% end %>
+              </div><!-- widebar-inner -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <%= yield :footer %>
+      <div id="footer" class="clearfix">
+        <p class="f4">copyright © 2009 UltraPower</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+/* 
+Document   : topo
+Created on : 2009-2-16, 14:24:33
+Author     : braisdom
+Description:
+Purpose of the stylesheet follows.
+*/
+
+/* 
+Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+#widebar-inner{
+    position:relative;
+}
+
+.topo-panel{
+float:left;
+}
+
+.province-map{
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.city-text{
+    position:absolute;
+    z-index:10;
+    font-size:1.4em;
+}
+
+.city-icon{
+    position:absolute;
+    z-index:10;
+}
+
+.legend{
+    float:left;
+}
+
+.legend-title{
+    font-size:1.4em;
+    font-weight: bold;
+}
+
+.green1{
+    width: 40px;
+    height:20px;
+    float:left;
+    text-align:center;
+    vertical-align: middle;
+    background-color: #009900;
+}
+.green2{
+    float:left;
+    width: 40px;
+    height:20px;
+    text-align:center;
+    vertical-align: middle;
+    background-color: #33cc00;
+}
+.green3{
+    float:left;
+    width: 40px;
+    height:20px;
+    text-align:center;
+    vertical-align: middle;
+    background-color: #33ff00;
+}
+.green4{
+    float:left;
+    width: 40px;
+    height:20px;
+    text-align:center;
+    vertical-align: middle;
+    background-color: #66ff33;
+}
+.green5{
+    float:left;
+    width: 40px;
+    height:20px;
+    text-align:center;
+    vertical-align: middle;
+    background-color: #99f433;
+}
+.green6{
+    float:left;
+    width: 40px;
+    height:20px;
+    text-align:center;
+    background-color: #ffff33;
+    vertical-align: middle;
+}

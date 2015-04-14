@@ -1,0 +1,167 @@
+<%=stylesheet_link_tag 'themes/wlan_opti/ui.theme',:media=>'all'  %>
+<%= stylesheet_link_tag "ui/ui/ui.slider.css" %>
+<%= javascript_include_tag "ui/ui/ui.slider.js"%>
+<%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+<%= stylesheet_link_tag "ui/core.css" %>
+<%= stylesheet_link_tag "ui/widget/widget.pagination.css" %>
+<%= stylesheet_link_tag "sun_css/Style.css"%>
+<%=javascript_include_tag "FusionCharts.js"%>
+
+<%= stylesheet_link_tag "sun_timepicker/jquery-ui-1.8.17.custom.css" %>
+<%= javascript_include_tag "sun_js/jquery-1.9.1.min.js"%>
+<%= javascript_include_tag "sun_timepicker/jquery-1.6.min.js"%>
+<%= javascript_include_tag "sun_timepicker/uic_framework.js"%>
+<%= javascript_include_tag "sun_timepicker/zh-CN/jquery.ui.datepicker-zh-CNS.js" %>
+
+<script type="text/javascript">
+  function customRange(input){
+    return {
+      minDate: (input.id == "end_time" ? $("#begin_time").datepicker("getDate") : null),
+      maxDate: (input.id == "begin_time" ? $("#end_time").datepicker("getDate") : null)
+    };
+  }
+
+  function changedate(){
+    time_gran=$("#time_gran").val()
+    //alert(time_gran);
+    $.ajax({
+      type: "POST",
+      url:  "/ult_user_analyses/check_dategran?time_gran="+time_gran,
+      dataType:"text",
+      success: function(msg){
+        $("#date_gran").empty();
+        $("#date_gran").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+  }
+
+  function checktime(){
+    var begin_time=$("#begin_time").val();
+    if(begin_time==""){
+      alert ("请选择时间");
+      return false;
+    }
+  }
+</script>
+<script type="text/javascript">
+  function check_date(n){
+    $('#date_time'+n).datepicker({showButtonPanel: true,selectState:false,changeMonth:true,changeYear:true,hideReset:false});
+  };
+</script>
+<%
+sort_url = params.merge({:page => nil})
+%>
+<%  area_gran="#{params[:area_gran]}"
+    time_gran="#{params[:time_gran]}"
+%>
+<div class="tree_content">
+  <div id="gradient1"></div>
+  <div class="tree_right">
+    <div class="new_title">用户分析</div>
+    <% form_tag(url_for(:action => action_name.to_s), :method=>:get ) do%>
+          <%@times={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月"}%>
+          <%@areas={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+          <%@tab_models=FreedReport::UltReportModel.find(:all,:conditions => ["name = ? ",@current_model.name])%>
+          <%@area_grans=[]%> <%@time_grans=[]%>
+          <%for tab_model in @tab_models%>
+             <%area=["#{@areas[tab_model.area_gran]}","#{tab_model.area_gran}"]%>
+             <%@area_grans<<area unless @area_grans.include? area%>
+             <%time=["#{@times[tab_model.time_gran]}","#{tab_model.time_gran}"]%>
+             <%@time_grans<<time unless @time_grans.include? time%>
+          <%end%>
+      <ul class="search_bg1">
+        <li>
+          <%= label_tag :time_gran,"区域粒度：" %>
+          <%=select( "area_gran","",@area_grans,{:selected=>@current_model.area_gran},:class => "select_01")%>
+        </li>
+        <li>
+          <%= label_tag :time_gran,"时间粒度：" %>
+          <%= select :time_gran,"",@time_grans,{:include_blank =>false,:selected=>@current_model.time_gran},:class => "select_01",:id=>"time_gran",:onchange=>"changedate()"%>
+        </li>
+
+        <%@my_params.each_with_index do |a , x|%>
+          <li>
+            <%=mark_unit(a,x)%>
+          </li>
+        <%end%>
+
+        <li>
+          <%= label_tag :analyses_kpi,"分析指标：" %>
+          <%= select :analyses_kpi,"",[["用户关联异常","use"],["Portal用户上线异常","portal"]],{:include_blank =>false,:selected=>params[:time_gran]},:class => "select_01"%>
+        </li>
+
+        <li>
+        <%=  label_tag :area_range, "区域范围："%>
+        <%=  render :partial => 'common_components/tree_text_tag'%>
+        </li>
+        
+        <span style="position:absolute; right:20px; top:10px;">
+          <a href="#"><%= export_to 'csv', "CSV", params %></a></span>
+        <li style=" width:980px; text-align:right;margin-top:-25px;">
+          <%= submit_tag "",:name => nil ,:class =>"buttonnew_01",:onclick =>"return checktime()"%>&nbsp;
+        </li>
+      </ul>
+      <%=render :partial => 'user_data' %>
+      <div class="table_wrap1">
+        <% ui_grid_for @grid ,:scrollable =>true do |g, cols, data| %>
+          <% g.head do %>
+            <% g.r do %>
+              <%for item in @columns%>
+              <%= g.format_sort(item,item, :html => {:width =>  "125"}, :url =>sort_url) %>
+              <%end%>
+            <% end %>
+          <% end %>
+          <% g.body do %>
+            <% if data.size >0 %>
+              <% data.each do |d| %>
+                <% g.r do %>
+                  <%for item in @columns%>
+                     <%if item.include?("数") %>
+                      <%=g.d d[item].to_i %>
+                     <%elsif item.include?("率") %>
+                      <%=g.d d[item].nil? ? "": d[item].to_f%>
+                     <%elsif item.include?("占比") %>
+                      <%=g.d d[item].nil? ? "": d[item].to_f%>
+                     <%elsif item.include?("时间") %>
+                      <%if @current_model.time_gran&&@current_model.time_gran=="month"%>
+                      <%=g.d d[item].to_s.to_date.strftime('%Y-%m') %>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="week" %>
+                      <%=g.d d[item].to_s.to_date.strftime('%Y-%m %W') %>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="hour" %>
+                      <%=g.d d[item].to_s.to_date.strftime('%Y-%m-%d %H') %>
+                      <%else%>
+                      <%=g.d d[item].to_s.to_date.strftime('%Y-%m-%d') %>
+                      <%end%>
+                     <%else%>
+                      <%if @my_links[item]%>
+                      <%=g.d link_to d[item],{:controller=>"ult_comment_reports",:action =>@my_links[item]}%>
+                      <%else%>
+                      <%=g.d d[item] %>
+                      <%end%>
+                     <%end%>
+                  <%end%>
+            <%#=g.d d[:ap_name],:style=>"word-wrap:break-word;"%>
+            <%#= g.d link_to((d[:dev_state]),{:controller => "log_analysis_details",:starttime=>"#{d[:starttime]}",:endtime=>"#{d[:endtime]}",:clientmac=>"#{d[:clientmac]}",:dev_state=>"#{d[:dev_state]}"},:popup => true,:title=>"下线详情") %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <td colspan="<%= 2+cols.size %>" style="border:none;">当前没有数据。</td>
+            <% end %>
+          <% end %>
+        <% end %>
+      <%end%>
+    </div>
+    <div style="margin-top:0.5em;" class="clearfix">
+      <% if !@ult_freed_reports.nil? && @ult_freed_reports.length > 0 %>
+        <div class="left f4">显示<%=@ult_freed_reports.total_entries %>个结果中的<%=@ult_freed_reports.current_page == @ult_freed_reports.page_count ? (@ult_freed_reports.total_entries - @ult_freed_reports.per_page * (@ult_freed_reports.page_count - 1)): @ult_freed_reports.per_page %>个</div>
+        <%=will_paginate @ult_freed_reports%>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+
+

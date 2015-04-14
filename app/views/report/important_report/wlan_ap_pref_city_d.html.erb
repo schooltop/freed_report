@@ -1,0 +1,131 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js" %>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js" %>
+   <style type="text/css">
+    .ui-grid-scrollable TABLE{
+      width:100%;
+    }
+  </style>
+  <script type="text/javascript">
+    function customRange(input){
+      return {
+        minDate: (input.id == "end_time" ? $("#begin_time").datepicker("getDate") : null),
+        maxDate: (input.id == "begin_time" ? $("#end_time").datepicker("getDate") : null)
+      };
+    }
+    function resizeTable(){
+      var height = document.documentElement.clientHeight;
+      var top=$(".ui-grid-scroll-body").offset().top;
+      height = height - top - 30;
+      $(".ui-grid-scroll-body").css("height", height);
+    }
+    $(function(){
+      $("#begin_time,#end_time").datepicker($.extend({}, $.datepicker.regional["zh-CN"], {
+        showStatus: true,
+        beforeShow: customRange
+      }));
+      resizeTable();
+    });
+  </script>
+<%end %>
+<%content_for :header_title do %>
+  各地市WLAN业务AP性能统计报表(日)
+<%end %>
+<div>
+ <%form_tag(url_for(:action=>'wlan_ap_pref_city_d'), :method => "get", :method=>"get") do %>
+    <div id="control" class="control clearfix">
+      <span style="float:left;margin-left:5px;"><%=rms_begin_time%></span>
+      <span style="float:left;margin-right:5px;"><%=rms_end_time%></span>
+      <span style="float:left;margin-right:5px;"><%=submit_tag '确定',:name=>nil %></span>
+      <ul class="ul export-box f5">
+        <li>
+          <%= export_to 'csv', "CSV", params %>
+        </li>
+      </ul>
+    </div>
+  <%end %>
+  <%
+  sort_url = params.merge({:page => nil})
+%>
+   <div id="showdata" class="form">
+    
+    <% ui_grid_for @grid ,:scrollable =>true do |g,cols,data|%>
+    <%g.head do %>
+      <%g.r do%>
+                   <%= g.format_sort(:sampledate,"统计时间", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:nodecn,"省份", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:citycn,"地市", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:ap_back,"AP退服率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:assocsucc_rate,"关联成功率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:rxbytes_max_rate,"上行峰值速率(Mbps/s)", :html => {:width => 125}, :url =>sort_url) %>             
+                   <%= g.format_sort(:txbytes_max_rate,"下行峰值速率(Mbps/s)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:userdown_max_rate,"单用户峰值下载速率(Mbps/s)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:abnormaldrops_rate,"关联终端异常掉线率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:refused_rate,"AP关联拥塞率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:busyap_rate,"超忙AP占比(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:idleap_rate,"超闲AP占比(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:up_flow,"AP上行流量(Mb)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:down_flow,"AP下行流量(Mb)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:unkonew_rate,"由于之前的关联无法识别与转移而导致重新关联失败率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:unsupport_rate,"因终端不支持基本速率集要求的速率而关联失败的失败率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:rssi_rate,"因RSSI过低而关联失败的失败率(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:max_online_rate,"峰值在线用户数", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:max_conncet_rate,"峰值关联用户数", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:busyap_num,"超忙个数", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:busy_level,"超忙程度", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:indoor_distribution_rate,"AP室分占比(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:indoor_put_pack_rate,"AP放装占比(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:outdool_distribution_rate,"AP室外占比(%)", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:ap_empty_t_rate,"AP空口下行重传率", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:ap_empty_a_rate,"AP空口收包错误率", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:access_inf_strength,"接收的信号平均强度", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:ap_num,"AP总数", :html => {:width => 125}, :url =>sort_url) %>
+                   <%= g.format_sort(:ap_signal_system_rate,"AP制式占比", :html => {:width => 125}, :url =>sort_url) %>
+    <%end%>
+   <%end%>
+    <%g.body do%>
+      <% if data.size >0 %>
+        <% data.each do |d| %>
+          <% g.r do %>
+                    <%=g.d d[:sampledate].nil? ? "":d[:sampledate].strftime("%Y-%m-%d")%>
+                    <%=g.d d[:nodecn]%>
+                    <%=g.d d[:citycn]%>
+                    <%=g.d d[:ap_back]%>
+                    <%=g.d d[:assocsucc_rate]%>
+                    <%=g.d d[:rxbytes_max_rate]%>
+                    <%=g.d d[:txbytes_max_rate]%>
+                    <%=g.d d[:userdown_max_rate].to_i%>
+                    <%=g.d d[:abnormaldrops_rate]%>
+                    <%=g.d d[:refused_rate]%>
+                    <%=g.d d[:busyap_rate]%>
+                    <%=g.d d[:idleap_rate]%>
+                    <%=g.d d[:up_flow]%>
+                    <%=g.d d[:down_flow]%>
+                    <%=g.d d[:unkonew_rate]%>
+                    <%=g.d d[:unsupport_rate]%>
+                    <%=g.d d[:rssi_rate]%>
+                    <%=g.d d[:max_online_rate]%>
+                    <%=g.d d[:max_conncet_rate]%>
+                    <%=g.d d[:busyap_num]%>
+                    <%=g.d d[:busy_level]%>
+                    <%=g.d d[:indoor_distribution_rate]%>
+                    <%=g.d d[:indoor_put_pack_rate]%>
+                    <%=g.d d[:outdool_distribution_rate]%>
+                    <%=g.d d[:ap_empty_t_rate]%>
+                    <%=g.d d[:ap_empty_a_rate]%>
+                    <%=g.d d[:access_inf_strength]%>
+                    <%=g.d d[:ap_num]%>
+                    <%=g.d d[:ap_signal_system_rate]%>
+            <%end%>
+        <% end %>
+      <%else%>
+        <%g.r do%>
+          <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+        <%end%>
+      <%end%>
+    <%end%>
+  <%end%>
+</div>
+</div>
+  <%= bottom_show @ap_pref_data_city_d %>

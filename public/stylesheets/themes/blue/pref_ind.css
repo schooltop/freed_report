@@ -1,0 +1,20 @@
+.top-control{
+    width:200px;
+    height:16px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: #BBD8E7;
+    border-bottom-color: #BBD8E7;
+    border-left-color: #BBD8E7;
+    border-right-color: #BBD8E7;
+}
+
+.region-dialog{
+    display:none;
+}

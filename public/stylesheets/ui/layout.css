@@ -1,0 +1,309 @@
+﻿/*layout*/
+
+body{
+   margin:0;
+}
+#wrapper{
+   border-width:0;
+}
+a{
+   text-decoration:none;
+}
+a:hover{
+   text-decoration:underline;
+}
+
+/*header*/
+#header{
+   border-top-width:0;
+   border-left-width:0;
+   border-right-width:0;
+}
+#header-inner{
+   margin-left:20.5em;
+}
+
+#navbar{
+   float:right;
+   width:80%;
+   font-size:1.2em;
+
+}
+
+#logo a{
+   float:left;
+   display:block;
+   font-size:1.4em;
+   font-weight:bold;
+   padding:.8em 0 0 0;
+}
+#logo a:hover{
+   text-decoration:none;
+}
+#navigation-wrap{
+   float:left;
+}
+#navigation{
+   float:left;
+   margin-bottom:-10px;
+   position:relative;
+}
+#navigation li{
+   border-bottom-width:0;
+
+}
+#navigation li a{
+   display:block;
+   float:left;
+   padding:.6em .8em;
+}
+#subnav{
+   padding:.3em 0 .2em;
+}
+#unused{
+   padding-right:.8em;
+   float:right;
+}
+#unused p{
+   float:right;
+   margin:0.8em 0;
+}
+
+#basic-search{
+   float:right;
+   padding-right:.8em;
+   padding-top:.3em;
+}
+#basic-search-wrap{
+   float:left;
+}
+#basic-search-wrap .ui-icon{
+   float:left;
+   margin:.2em .3em;
+   display:inline;
+}
+#basic-search-wrap input{
+   float:left;
+   border:none;
+   width:7em;
+}
+.sidebar-controller-hide{
+    position: absolute;
+     top: 100px;
+     left: 150px;
+}
+
+.sidebar-controller-show {
+     writing-mode: tb-rl;
+     position: absolute;
+     top: 94px;
+     left: 5px;
+     padding: 3px;
+     border: 1px solid #d1e7f0;
+     background: rgb(242, 242, 242);
+     cursor: pointer;
+     color: #1c6280;
+}
+.has-sidebar-controller {
+    margin-left: 2em;
+}
+/*content
+.has-sidebar{
+   margin-left:19em;
+
+}*/
+
+.has-minisidebar{
+   margin-left:6em;
+}
+
+
+#sidebar{
+   float:left;
+   margin:1.3em 0em 1.5em -18em;
+   position:relative;
+   width:18em;
+   display:inline;/*ie6 bug fix:when set float,the margin-left and margin-right is twice what you get!*/
+}
+.has-minisidebar #sidebar{
+   width:2.8em;
+   margin-left:-4.5em;
+}
+.has-screen-meta #sidebar{
+   margin-top:2.5em;
+}
+#widebar{
+  float:none;
+  width:auto;
+}
+.has-sidebar #widebar{
+   width:99%;
+   float:right;
+}
+#screen-meta{
+   margin-right:.8em;
+}
+
+#widebar-inner{
+   padding-top:.5em;
+   margin:0 0.5em 0 0.5em;
+}
+#widebar h1{
+   margin-top:.4em;
+   margin-bottom:.5em;
+   font-style:italic;
+   font-weight:normal;
+   font-size:2em;
+}
+.has-screen-meta #widebar h1{
+   margin-top:0;
+}
+#footer{
+  text-align: center;
+}
+/*widget*/
+/*board 面板框*/
+.board{
+  margin-bottom:1em;
+}
+.board .board-header{
+   margin:0;
+   font-size:1em;
+   font-weight:bold;
+   padding:.5em .5em;
+}
+.board .board-content{
+   border-top-width:0;
+   padding:.5em;
+}
+/*column*/
+.column-left{
+  width:49.5%;
+  float:left;
+  padding-bottom: 1em;
+}
+.column-right{
+  width:49.5%;
+  padding-bottom: 1em;
+  float:right;
+}
+.search-box{
+   float:right;
+}
+
+/*control*/
+.control{
+   font-size:1.2em;
+   margin:.5em 0;
+}
+
+.control .sub{
+   padding-bottom:.3em;
+}
+.control .ui-widget{
+  font-size:1em;
+}
+.control .ui-pagination{
+  float:right;
+}
+.ui-widget .ui-widget{
+  font-size:1em;
+}
+.control .actions{
+  float:left;
+  margin:0;
+  margin-right:0.2em;
+}
+.control .filters{
+  float:left;
+  margin-right:0.3em;
+}
+.control .actions-more{
+  z-index: 2;
+  position: absolute;
+  margin: 2em 0 0 -6em;
+  visibility: hidden;
+}
+/*export-box*/
+.control .export-box{
+  float:right;
+}
+.export-box{
+  padding:.2em 0;
+
+}
+.export-box .icon{
+  height:16px;
+  width: 20px;
+}
+.export-box .pipe{
+  padding:0 5px;
+}
+
+/*filter*/
+
+/*dashboard sort */
+.ui-sortable-placeholder {
+    border: 1px dotted black;
+    visibility: visible !important;
+}
+
+/*grid*/
+.grid{
+  border-spacing:0;
+  width:100%;
+  border-collapse: collapse;
+}
+.grid th{
+  font-weight:normal;
+}
+.grid th,.grid td{
+  text-align:center;
+  padding:.3em;
+  border-top-width: 1px; 
+  border-top-color: inherit;
+  border-top-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: inherit;
+  border-bottom-style: solid;
+  border-right-width: 1px;
+  border-right-color: inherit;
+  border-right-style: solid;
+  border-left-width: 1px;
+  border-left-color: inherit;
+  border-left-style: solid;
+
+
+}
+.grid tbody tr{
+  background:none !important;
+}
+
+/***** Ajax indicator ******/
+#ajax-indicator {
+position: absolute; /* fixed not supported by IE */
+background:#EEF1F8;
+border: 1px solid #848C99;
+/*background-color:#eee;*/
+/*border: 1px solid #bbb;*/
+top:35%;
+left:40%;
+width:20%;
+font-weight:bold;
+font-size:12px;
+text-align:center;
+padding:0.6em;
+z-index:100;
+filter:alpha(opacity=50);
+opacity: 0.5;
+}
+
+html>body #ajax-indicator { position: fixed; }
+
+#ajax-indicator span {
+background-position: 0% 40%;
+background-repeat: no-repeat;
+background-image: url(../../images/loading.gif);
+padding-left: 26px;
+vertical-align: bottom;
+}

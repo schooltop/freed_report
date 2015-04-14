@@ -1,0 +1,28 @@
+<%=stylesheet_link_tag 'ultra/colors.sugar',:media=>'all' %>
+<%=stylesheet_link_tag 'ultra/crm-style',:media=>'all' %>
+
+<div id="shortcuts" class="leftList">
+    <div id='unittree' height=100% class='clsTreeDiv'>
+    <%#site_tab%>
+    <%i=0%>
+    <%site_menu.each do |m|%>
+    <%i=i+1%>
+        <div  style="background:url(/stylesheets/themes/ultrapower/images2/content_title_bg.png) repeat-x;border: 1px solid;border-color: #cbdae6;" >
+          <h3 style="font-size:118%;">
+               <img  src='/stylesheets/themes/ultrapower/images2/widget_header_i.gif' style="padding-left:8px;"/>
+               <span style="padding-left:10px;"><%=link_to_function m.name,onclick="jQuery('#ul_shortcuts'+'#{i}').toggle()"%></span>
+          </h3>
+        </div>
+       <ul id="ul_shortcuts<%=i%>"  style="display: block;">
+         <ol class="ui-menu-content ui-helper-reset ui-widget-content ui-corner-bottom" style="padding: .4em .2em;font-size:1.2em;">
+                  <%m.childmenus.each do |n|%>
+                      <%=site_title_select "#{n.name}","#{n.url}","#{n.url.to_s.delete('/')}"%>
+                  <%end%>
+         </ol>
+       </ul>
+      <%end%>
+    </div>
+  </div>
+
+
+

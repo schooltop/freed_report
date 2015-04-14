@@ -1,0 +1,58 @@
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development: &config
+  adapter: mysql
+  encoding: utf8
+  database: mobile_new
+  username: root
+  password: ultra_wlan
+  socket: /tmp/mysql.sock
+  host: 192.168.101.80
+  port: 3306
+
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  *config
+
+production:
+  *config
+
+wifi_rms:
+  adapter: oracle
+  database: (DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.100.151)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = ydwg)(SERVER = DEDICATED)))
+  username: ultranms
+  password: ultranms
+  encoding: utf8
+  host: 192.168.100.151
+  service: YDWG
+
+wg_nms:
+  adapter: oracle
+  database: (DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = 10.190.102.67)(PORT = 29999)))(CONNECT_DATA =(SERVICE_NAME = billdb)))
+  username: wangguanzx
+  password: RadiuS_WangguaN
+  encoding: utf8
+  host: 10.190.102.67
+  service: billdb
+
+ultra_wlan:
+  adapter: oracle
+  database: (DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = 10.190.102.67)(PORT = 29999)))(CONNECT_DATA =(SERVICE_NAME = billdb)))
+  username: wangguanzx
+  password: RadiuS_WangguaN
+  encoding: utf8
+  host: 10.190.102.67
+  service: billdb
+
+
+wg_nms:
+  adapter: oracle
+  database: (DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = 10.209.186.172)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = orapre)))
+  username: prestat
+  password: Ms_9p3a
+  encoding: utf8
+  host: 10.209.186.172
+  service: orapre
