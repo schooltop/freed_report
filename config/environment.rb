@@ -24,26 +24,7 @@ Rails::Initializer.run do |config|
 config.load_paths += %W( #{RAILS_ROOT}/app/jobs )
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  # Specify gems that this application depends on and have them installed with rake gems:install
-  # config.gem "bj"
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "sqlite3-ruby", :lib => "sqlite3"
-  # config.gem "aws-s3", :lib => "aws/s3"
-
-  # Only load the plugins named here, in the order given (default is alphabetical).
-  # :all can be used as a placeholder for all plugins not explicitly named
-  # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
-
-  # Skip frameworks you're not going to use. To use Rails without a database,
-  # you must remove the Active Record framework.
-  # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
-
-  # Activate observers that should always be running
-  # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
-
-  # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
-  # Run "rake -D time" for a list of tasks for finding time zone names.
-  #config.time_zone = 'UTC'
+  
   config.action_controller.session = {
     :session_key => '_opengoss_session',
     :secret      => '31d4c738f0d7267f7edf9ea5df15cc6558132cc7a2fdc34376e43dfa6e34eec62e540751ba94dc673267a2d404e3b215a32b1cba324cae058feb6266f4317634'
@@ -83,12 +64,7 @@ $PM_DIR = "PM"
 $CM_DIR = "CM"
 $AUTH_URL = "http://192.168.101.80:58045/pasm/pasmservices/PASMWebService"
 
-require 'casclient'
-require 'casclient/frameworks/rails/filter'
 
-CASClient::Frameworks::Rails::Filter.configure(
-  :cas_base_url => "http://192.168.101.80:58045/ucas"
-)
 $cas_logger = CASClient::Logger.new(RAILS_ROOT+'/log/cas.log')
 $cas_logger.level = Logger::DEBUG
 $HOURLY_REPORT=true

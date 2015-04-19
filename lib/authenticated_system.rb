@@ -109,23 +109,6 @@ module AuthenticatedSystem
     self.current_user = User.find_by_id(session[:user_id]) if session[:user_id]
   end
   
-  def login_from_sso
-    valid_user = User.find_by_login(session[:cas_user]) if session[:cas_user]
-#    session[:cas_auth] = true
-    return valid_user if !valid_user.nil? && !valid_user.role_id.blank? && !valid_user.domain_id.blank? && !session[:cas_auth].nil?
-    begin
-      r_user = SecuritySync::Account.get_user session[:cas_user]
-      if valid_user.nil?
-        self.current_user =  accord_account r_user
-      else
-        self.current_user =  update_account(valid_user, r_user)
-      end
-    rescue Exception => e
-      self.current_user =  User.find_by_login(session[:cas_user])
-    end
-    session[:cas_auth] = true
-    return @current_user
-  end
   
   def update_account(valid_user, r_user)
     valid_user.attributes = {:name => r_user[:name], :role_id => r_user[:role_id], :domain_id => r_user[:domain_id],  :email => r_user[:email]}

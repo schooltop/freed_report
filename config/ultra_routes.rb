@@ -2,8 +2,6 @@
 ActionController::Routing::Routes.draw do |map|
 
   ########################个性化的相关配置##################
-  #@孙文杰--2012-03-27
-  map.resources :new_import, :collection => { :import_errors => :get, :index => :get }
 
    map.namespace :freet_report do |freet_report| #前置报表手动配置相关模块  2013-12-17---李江锋
     freet_report.resources :tabmenus
