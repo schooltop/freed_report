@@ -1,0 +1,86 @@
+<% content_for :head do %>
+<%#=javascript_include_tag  'prototype' %>
+ <script>
+  function togo(){
+    jQuery('#mark_targ').toggle(400);
+    jQuery('#ult_report_model_time_gran').attr("value","");
+    jQuery('#ult_report_model_area_gran').attr("value","");
+  }
+
+  function helpshow(){
+    jQuery('#mark_help').show('slow');
+  }
+
+  function helphide(){
+    jQuery('#mark_help').hide('slow');
+  }
+
+function check_work(n){
+jQuery(".report_charts").css('color',"#000000");
+document.getElementById(n).style.color="#f59b45";
+    $.ajax({
+      type: "POST",
+      url:  "/freed_report/ultra_company_charts/check_report_chart?ultra_company_chart_id="+n,
+      dataType:"text",
+      success: function(msg){
+        $("#checkwork").empty();
+        $("#checkwork").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+}
+ </script>
+<% end %>
+<% content_for :header_title, "图表配置" %>
+<%if @charts%>
+  <%for chart in @charts%>
+     <%if params[:ultra_company_chart_id]&&params[:ultra_company_chart_id]==chart.id.to_s%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%elsif !params[:ultra_company_chart_id]&&chart==@charts[0]%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%else%>
+       <input id="<%=chart.id%>"name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>"  style="color:#000000;" >
+     <%end%>
+  <%end%>
+<%end%><br/><br/>
+
+<div  style="position: absolute; visibility: visible; z-index: 1000; right: 50px; top: 180px; background-image: none;">
+  <a href="#" onclick="helpshow()"><%=image_tag("/stylesheets/themes/ultrapower/images2/help.gif")%>帮助</a>
+</div>
+<%if @charts&&@charts.size>0%>
+<div id="hidden_chart_demo" style=" display:none;position: absolute; visibility: visible; z-index: 1000; right: 30px; top: 588px; background-image: none;">
+<%else%>
+<div id="hidden_chart_demo" style="display:none;position: absolute; visibility: visible; z-index: 1000; right: 30px; top: 305px; background-image: none;">
+<%end%>
+  
+</div>
+
+
+<div id="mark_help" style="display:none;position: absolute; visibility: visible; z-index: 1000; right: 40px; top: 167px; background-image: none;">
+  <table width="300" heigth="50" border="0" cellpadding="1" cellspacing="0" class="olBgClass">
+      <tbody><tr><td><table width="100%"  border="0" cellpadding="2" cellspacing="0" class="olCgClass">
+       <tbody><tr><td width="100%" class="olCgClass">
+          <div class="olCapFontClass">
+            <div style="float:left">图表属性参考手册：</div>
+            <a href="javascript:return cClick();" title="关闭" onclick="helphide()">
+              <span style="color:#eeeeff;font-family:Verdana,Arial,Helvetica;font-size:67%;text-decoration:underline;">
+                <div style="float: right"><img border="0" style="margin-left:2px; margin-right: 2px;" src="/stylesheets/themes/ultrapower/images2/close.gif"></div>
+              </span></a></div></td></tr></tbody></table><table width="100%" border="0" cellpadding="2" cellspacing="0" class="olFgClass">
+                <tbody><tr><td valign="top" class="olFgClass">
+                  <div  style="height:250px;overflow-y:scroll;">
+                    <%io=open("#{RAILS_ROOT}/public"+"/javascripts/jscolor/chart_attributes.txt") %>
+                    <%arr = io.readlines %>
+                    <p><br><strong><font color="#ddd">属性分类参考：</font></strong></p>
+                    <ul style="padding-left:2px;">
+                    <%for i in arr%>
+                      <li ><%=i%></li>
+                    <%end%>
+                    </ul>
+                  </div>
+                  <script type="text/javascript" src="/javascripts/jscolor/jscolor.js"></script>
+                  <p><b>取色参考: </b><input class="color" value="66ff00" name="color"></p>
+
+                    </td></tr></tbody></table></td></tr></tbody></table>
+</div>
+<div id="checkwork"><%=render :partial => 'current_report'%></div>

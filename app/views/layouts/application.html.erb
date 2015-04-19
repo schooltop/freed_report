@@ -5,59 +5,19 @@
   <%=render :partial=>'layouts/head'%>
   <body class="<%=controller.controller_name%>">
     <div id="wrapper" class="ui-layout">
-       <%=render :partial=>'layouts/header'%>            
-    <%
-      sidebar ||= render :partial => ('/layouts/siteleft') unless self.controller_name== 'dashboard'
+       <%=render :partial=>'layouts/header'%>
+      <%
+      sidebar ||= render :partial => (File.join controller.sidebar, 'sidebar') if partial_exist?(controller.sidebar, 'sidebar')
       screen_meta = yield :screen_meta
       screen_meta ||= render :partial=>'screen_meta' if partial_exist?(controller.class.controller_path, 'screen_meta')
-    %>
-       
+      %>
       <div id="content-wrap2" class="clearfix">
         <div id="content-wrap">
-
-
-<script type="text/javascript">
-  function GetCurrentStyle (obj, prop,num) {
-     if (obj.currentStyle) {
-     if (num==0) {
-     document.styleSheets[0].cssText=document.styleSheets[0].cssText.replace(/19em/g,"1em");
-     }
-     else {
-     document.styleSheets[0].cssText=document.styleSheets[0].cssText.replace(/1em/g,"19em");
-     }
-   }
-     else if (window.getComputedStyle) {
-     if (num==0) {
-     document.styleSheets[0].cssRules[0].style.cssText=document.styleSheets[0].cssRules[0].style.cssText.replace(/19em/g,"0em");
-     }
-     else {
-    document.styleSheets[0].cssRules[0].style.cssText=document.styleSheets[0].cssRules[0].style.cssText.replace(/0em/g,"19em");
-     }
-     }
-     return null;
-}    
-function showSiterbar(){
-    var b=document.getElementById('leftColumn')
-    var c=document.getElementById('content')
-if(b.style.display=="block"){
-     GetCurrentStyle(c,"margin-left",0);    
-     b.style.display="none";
-}else{
-   GetCurrentStyle(c,"margin-left",1);
-   b.style.display="block";
-}
-}
-</script>
-
-
-
-             
-              <div id="content" class="clearfix <%='has-sidebar' unless sidebar.nil? %> <%='has-screen-meta' unless screen_meta.nil? %>">
-             <% unless sidebar.nil? %>
-                <%=sidebar%>
-                <div style="z-index:200;margin-top:120px;float:left;"><img id='HideHandle' name='HideHandle' src='/images/crm/hide.gif' alt='' onclick="showSiterbar()" /></div>
+          <div id="content" class="clearfix <%='has-sidebar' unless sidebar.nil? %> <%='has-screen-meta' unless screen_meta.nil? %>">
+            <% unless sidebar.nil? %>
+              <%=sidebar%>
             <% end %>
-             <div id="widebar">
+            <div id="widebar">
               <% unless screen_meta.nil? %>
                 <%=screen_meta%>
               <% end %>

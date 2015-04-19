@@ -1,0 +1,153 @@
+<% content_for :head do %>
+<%=javascript_include_tag  'prototype' %>
+<script type="text/javascript">___saveJQFromPrototype = jQuery; jQuery = undefined; jQuery = undefined;</script>
+<script type="text/javascript">jQuery = ___saveJQFromPrototype; jQuery = ___saveJQFromPrototype;</script>
+ <script type="text/javascript">
+  function togo(){
+    jQuery('#mark_targ').toggle(400);
+    jQuery('#ult_report_model_time_gran').attr("value","");
+    jQuery('#ult_report_model_area_gran').attr("value","");
+  }
+
+  function helpshow(){
+    jQuery('#mark_help').show('slow');
+  }
+
+  function helphide(){
+    jQuery('#mark_help').hide('slow');
+  }
+
+  function check_work(){
+new Ajax.Updater('checkwork', '/freed_report/ult_report_models/check_worker?idnum='+jQuery('#ult_report_model_ultra_company_db_model_id').val()
+); }
+
+  function check_model(){
+  window.location.href='/freed_report/ult_report_models/copy_report_model?id='+jQuery('#copy_model_report').val()
+}
+
+</script>
+<% end %>
+<% content_for :header_title, "创建SQL报表模版" %>
+
+<div  style="position: absolute; visibility: visible; z-index: 1000; right: 268px; top: 367px; background-image: none;">
+  <a href="#" onclick="helpshow()"><%=image_tag("/stylesheets/themes/ultrapower/images2/help.gif")%>帮助</a>
+</div>
+
+<div id="mark_help" style="display:none;position: absolute; visibility: visible; z-index: 1000; right: 40px; top: 167px; background-image: none;">
+  <table width="300" border="0" cellpadding="1" cellspacing="0" class="olBgClass">
+      <tbody><tr><td><table width="100%" border="0" cellpadding="2" cellspacing="0" class="olCgClass">
+       <tbody><tr><td width="100%" class="olCgClass">
+          <div class="olCapFontClass">
+            <div style="float:left">SQL填写注意事项：</div>
+            <a href="javascript:return cClick();" title="关闭" onclick="helphide()">
+              <span style="color:#eeeeff;font-family:Verdana,Arial,Helvetica;font-size:67%;text-decoration:underline;">
+                <div style="float: right"><img border="0" style="margin-left:2px; margin-right: 2px;" src="/stylesheets/themes/ultrapower/images2/close.gif"></div>
+              </span></a></div></td></tr></tbody></table><table width="100%" border="0" cellpadding="2" cellspacing="0" class="olFgClass">
+                <tbody><tr><td valign="top" class="olFgClass">
+                  <div class="olFontClass">
+                    <p><br><strong><font color="#ddd">SQL示例：</font></strong></p>
+                    <ul>
+                      <li>select</li>
+                      <li>c.citycn <font color="#ff0000">地市</font>, </li>
+                      <li>c.nodedn  <font color="#ff0000">标号</font> </li>
+                      <li>from </li>
+                      <li>config_infos c </li>
+                      <li>where <font color="#ff0000">1=1</font> and citycn='主城片区' and nodetype=1  </li>
+                    </ul>
+                    <p><strong><font color="#ddd">备注：</font></strong></p>
+                    <ul>
+                      <li>一、查询字段取<font color="#ff0000">中文别名</font>； </li>
+                      <li>二、where条件后添加<font color="#ff0000">1=1</font> 后续条件用<font color="#ff0000">and</font>连接。 </li>
+                    </ul>
+                  </div>
+                    </td></tr></tbody></table></td></tr></tbody></table>
+</div>
+<%@times={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月","all"=>"全部"}%>
+<%@areas={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+<% form_for :ult_report_model, @ult_report_model,:url => {:action => 'create'}, :html => {:class => "form ui-widget"} do |f| -%>
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <% field_set_tag nil, :style => "padding: 1em;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class="wrap">
+
+          <div class="li">
+              <%= f.label 'report_link','撰取连接', :class => 'label', :required => true %>
+              <%if params[:ult_report_model]%>
+                 <%=f.text_field :report_link ,:value=>params[:ult_report_model][:report_link],:style=>"width:585px"%>
+              <%else%>
+                 <%=f.text_field :report_link,:style=>"width:585px"%>
+              <%end%>
+          </div>
+
+
+          <div class="li">
+             <div class="col left">
+                  <label class="label label" for="ult_report_model_time_gran"><em>*</em>所属菜单：</label>
+                  <%=select( "menu","",FreedReport::Tabmenu.wlanmenuitems.collect{|c| [c.name,c.id.to_s]},:selected=>params[:menu])%>
+             </div>
+             <div class="col right">
+                  <label class="label label" for="ult_report_model_time_gran">模版复制：</label>
+                  <%=select "copy_model","report",FreedReport::UltReportModel.find(:all,:order=>"name desc,area_gran,time_gran").collect{|c| [c.name.to_s+"("+@areas[c.area_gran].to_s+","+@times[c.time_gran].to_s+")",c.id.to_s]},{:include_blank => "新建",:selected=>"#{params[:copy]}"},:onchange=>"check_model()"%>
+             </div>
+          </div>
+
+          <div id="checkwork">
+                <%=render :partial=>"db_check"%>
+          </div>
+
+          <div class="li">
+                 <%= f.label 'name','模版名称', :class => 'label', :required => true %>
+              <%if params[:ult_report_model]%>
+                 <%=f.text_field :name ,:value=>params[:ult_report_model][:name],:style=>"width:500px"%><%=button_to_function "粒度选项",onclick="togo()"%>
+              <%else%>
+                 <%=f.text_field :name,:style=>"width:500px"%><%=button_to_function "粒度选项",onclick="togo()"%>
+              <%end%>
+           </div>
+
+           <%if params[:ult_report_model]&&params[:ult_report_model][:time_gran]!=""%><div class="li" id="mark_targ"><%else%><div class="li" id="mark_targ" style="display:none;"><%end%>
+             <div class="col left">
+                  <%=f.label :time_gran, "时间粒度", :class => "label",:required => true %>
+
+               <%if params[:ult_report_model]%>
+                   <%=f.select :time_gran, [["小时",'hour'],["天",'day'],["周",'week'],["月",'month'],["全部",'all']],:include_blank => true,:selected=>params[:ult_report_model][:time_gran]%>
+                <%else%>
+                   <%=f.select :time_gran, [["小时",'hour'],["天",'day'],["周",'week'],["月",'month'],["全部",'all']],{:include_blank => true}%>
+                <%end%>
+             </div>
+             <div class="col right">
+                   <%=f.label :area_gran, "地域粒度", :class => "label",:required => true %>
+                <%if params[:ult_report_model]%>
+                   <%=f.select :area_gran,[["AP",'ap'],["AC",'ac'],["交换机",'sw'],["郊县",'town'],["地市",'city'],["省份",'province'],["热点",'port']],:include_blank => true,:selected=>params[:ult_report_model][:area_gran]%>
+                <%else%>
+                   <%=f.select :area_gran,[["AP",'ap'],["AC",'ac'],["交换机",'sw'],["郊县",'town'],["地市",'city'],["省份",'province'],["热点",'port']],{:include_blank => true}%>
+                <%end%>
+             </div>
+           </div>
+
+           <div class="li">
+                 <%= f.label 'str_sql','sql脚本', :class => 'label', :required => true %>
+                 <%if params[:ult_report_model]&&(!params[:ult_report_model][:str_sql].include? "填写sql脚本注意事项")&&!params[:copy_model]%>
+                     <%= f.text_area :str_sql,:rows =>"140px", :cols =>"60px",:onclick=>"helphide()",:value=>params[:ult_report_model][:str_sql],:style=>"margin: 0px; height: 223px; width: 590px;color:#ff0000;" %>
+                 <%else%>
+                     <%= f.text_area :str_sql,:rows =>"140px", :cols =>"60px",:style=>"margin: 0px; height: 223px; width: 590px;color:#999;",
+               :value=>"填写sql脚本注意事项："+"
+    SQL示例："+ "
+          select"+ "
+               citycn 地市,"+"
+               acall ac数量"+"
+          from "+"
+               ult_net_reports"+"
+               where 1=1 and reportdate =to_date('2014-1-1','yyyy-mm-dd')"+"
+      备注：一、查询字段取中文别名；"+"
+          二、where条件后添加1=1 后续条件用and连接。",
+                     :onmouseover=>"this.focus();this.select();",
+           :onclick=>"if(value==defaultValue){value='';this.style.color='#000'};helphide()",
+           :onBlur=>"if(!value){value=defaultValue;this.style.color='#999'}" %>
+                 <%end%>
+           </div>
+   </div>
+    <div class="li" align="center">
+        <%= f.submit '确定' %>
+        <%=link_button_to "取消", params.except(:authenticity_token,:id).merge!({:controller=>:ult_report_models, :action=>:index})%>
+    </div>
+  <% end %>
+<% end -%>

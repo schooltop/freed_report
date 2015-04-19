@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%=I18n.locale%>" lang="<%=I18n.locale%>">
+  <head>
+    <%=stylesheet_link_tag 'ui/core',:media=>'all' %>
+    <%=stylesheet_link_tag 'ui/layout',:media=>'all' %>
+    <%=stylesheet_link_tag 'ui/ui/ui.core',:media=>'all' %>
+    <%=stylesheet_link_tag 'ui/icons',:media=>'all' %>
+    <%=stylesheet_link_tag 'themes/wordpress_blue/ui.theme',:media=>'all'  %>
+    <%=stylesheet_link_tag 'ui/widget/widget.grid',:media=>'all' %>
+    <%=stylesheet_link_tag 'ui/widget/widget.pagination',:media=>'all' %>
+    <%=stylesheet_link_tag 'webport', :media=>'all' %>
+    
+    <%=stylesheet_link_tag 'themes/wifi2/ui.theme',:media=>'all'  %>
+    
+    <%=javascript_include_tag 'ui/jquery' %>
+    <%=javascript_include_tag 'ui/ui/effects.core' %>
+    <%=javascript_include_tag 'ui/ui/ui.core' %>
+    <%=javascript_include_tag 'ui/layout' %>
+    <%=javascript_include_tag 'ui/widget/widget.grid' %>
+    <%=javascript_include_tag 'ui/widget/widget.pagination' %>
+    <%=javascript_include_tag 'ui/widget/widget.pagination' %>
+    <%=javascript_include_tag 'ui/widget/widget.placeholder' %>
+    <script>
+        $(function(){
+            $('.ui-grid').grid();
+            $('.ui-pagination').pagination();
+            $('.ui-placeholder').placeholder();
+        });
+        $(document).ready(function(){
+            var ids= $('#windowtips');
+            setTimeout(function(){
+                if(ids.length!=0){
+                    ids.slideUp();
+                }
+            },10000);
+        });
+        $(function(){
+            $(".access_controlled").each(function(){
+                $(this).attr("disabled",true);
+            }).click(function(){return false;});
+        });
+    </script>
+    <%
+    def controlled(url)
+      if @user_permissions.include?(url)
+        return "  "
+      else
+        return " access_controlled"
+      end
+    end
+  %>
+    <%= yield :head %>
+  </head>
+  <body class="<%=controller.controller_name%>-<%=controller.action_name%>">
+    <%=yield%>
+  </body>
+</html>

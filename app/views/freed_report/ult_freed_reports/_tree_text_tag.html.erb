@@ -1,0 +1,126 @@
+<label class="label label" for="tabmenu_time_gran"><em>*</em>区域范围：</label>
+<%=text_field_tag "are",params["are"],:value=>params["are"]?params["are"]:"全省",:onclick=>"showSiterbar(0);acdiv",:style=>"width:257px;"%>
+<div style="z-inde:10;overflow-x: auto; overflow-y: auto;display:none;height:150px;width:260px; border:solid 1px;border-color:#aaa;" id="myare0" onmouseover="MM_over(this)" onmouseout="MM_out(this)" >
+    <img src='/javascripts/ui/external/dynatree/skin/ltM_ne.gif'/>
+            <%if params["are"]&&!params[:myare]%>
+                <input type="checkbox"  id="are_myare_id" name="myare"  onclick="alltextbook();"/>全省</br>
+            <%else%>
+                <input type="checkbox"  id="are_myare_id" name="myare" checked="checked" onclick="alltextbook();"/>全省</br>
+            <%end%>
+    <%@parents=ConfigInfo.find_by_sql("select * from config_infos where nodetype=1")%>
+    <%for @parent in @parents%>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <%if @parent.cityid==@parents.last.cityid%>
+              <img src='/javascripts/ui/external/dynatree/skin/ltP_ne.gif' id="add<%=@parent.cityid%>" onclick="showSiterbar(<%=@parent.cityid%>)" style="display:inline;"/>
+              <img src='/javascripts/ui/external/dynatree/skin/ltM_ne.gif' id="mines<%=@parent.cityid%>" onclick="showSiterbar(<%=@parent.cityid%>)" style="display:none;margin-left:-3px"/>
+          <%else%>
+              <img src='/javascripts/ui/external/dynatree/skin/ltP_nes.gif' id="add<%=@parent.cityid%>" onclick="showSiterbar(<%=@parent.cityid%>)" style="display:inline;"/>
+              <img src='/javascripts/ui/external/dynatree/skin/ltM_nes.gif' id="mines<%=@parent.cityid%>" onclick="showSiterbar(<%=@parent.cityid%>)" style="display:none;margin-left:-3px"/>
+          <%end%>
+          <%if params[:cityare]&&params[:cityare][:mycity_ids].include?(@parent.nodedn)%>>
+              <input type="checkbox"  id="cityare_mycity_ids_<%=@parent.cityid%>" name="cityare[myac_ids][]"  checked="checked"  onclick="textbook('<%=@parent.nodecn%>','<%=@parent.cityid%>');"/>
+          <%else%>
+              <input type="checkbox"  id="cityare_mycity_ids_<%=@parent.cityid%>" name="cityare[myac_ids][]" onclick="textbook('<%=@parent.nodecn%>','<%=@parent.cityid%>');"/>
+          <%end%>
+      <%= @parent.nodecn %> </br>
+
+      <%if params[:acare]&&params[:acare][:myac_ids]%>
+          <%for acshowdn in params[:acare][:myac_ids]%>
+            <%acshow=ConfigInfo.find_by_sql("select * from config_infos where nodedn='#{acshowdn}' and nodetype=8")%>
+            <%@actrue=0 if acshow.cityid==@parent.cityid%>
+          <%end%>
+          <%if @actrue&&@actrue==0%>
+            <div style="display:block;" id="myare<%=@parent.cityid%>">
+          <%else%>
+            <div style="display:block;" id="myare<%=@parent.cityid%>">
+          <%end%>
+      <%else%>
+            <div style="display:none;" id="myare<%=@parent.cityid%>">
+      <%end%>
+     <%=render :partial=>"tree_tag",:object=>@parent%></div>
+     <%end%>
+</div>
+
+<script>
+
+function alltextbook(){
+  var add=document.getElementById('are')
+  var mycheck=document.getElementById('are_myare_id')
+if(event.srcElement.checked==true){
+      if(add.value){
+        add.value=add.value+","+"全省";
+      }else{
+        add.value=add.value+"全省";
+      }
+  }else{
+     if(add.value){
+       add.value=add.value.replace(",全省","");
+       add.value=add.value.replace("全省","");
+       if (add.value.substr(0, 1)==","){add.value=add.value.slice(1);}
+     }
+  }
+}
+
+function actextbook(book,checkid){
+  var add=document.getElementById('are')
+  var mycheck=document.getElementById('acare_myac_ids_'+checkid)
+  if(event.srcElement.checked==true){
+      if(add.value){
+        add.value=add.value+","+book;
+      }else{
+        add.value=add.value+book;
+      }
+  }else{
+     if(add.value){
+       add.value=add.value.replace(","+book,"");
+       add.value=add.value.replace(book,"");
+       if (add.value.substr(0, 1)==","){add.value=add.value.slice(1);}
+     }
+  }
+}
+
+function textbook(book,checkid){
+  var add=document.getElementById('are')
+  var mycheck=document.getElementById('cityare_mycity_ids_'+checkid)
+  if(event.srcElement.checked==true){
+      if(add.value){
+        add.value=add.value+","+book;
+      }else{
+        add.value=add.value+book;
+      }
+  }else{
+     if(add.value){
+       add.value=add.value.replace(","+book,"");
+       add.value=add.value.replace(book,"");
+       if (add.value.substr(0, 1)==","){add.value=add.value.slice(1);}
+     }
+  }
+}
+
+function MM_over(mmObj) {
+	var mSubObj = mmObj;
+	mSubObj.style.display = "block";
+}
+function MM_out(mmObj) {
+	var mSubObj = mmObj;
+	mSubObj.style.display = "none";
+}
+
+function showSiterbar(i){
+var b=document.getElementById('myare'+i)
+if(b.style.display=="block"){
+     b.style.display="none";
+}else{
+   b.style.display="block";
+}
+var add=document.getElementById('add'+i)
+var mines=document.getElementById('mines'+i)
+if(add.style.display=="inline"){
+     add.style.display="none";
+     mines.style.display="inline";
+}else{
+   add.style.display="inline";
+   mines.style.display="none";
+}
+}
+</script>

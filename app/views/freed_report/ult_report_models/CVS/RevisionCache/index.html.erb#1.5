@@ -1,0 +1,98 @@
+
+  <% content_for :head do %>
+  <style type="text/css">
+    .enterprises{
+    }
+  </style>
+  <script type="text/javascript">
+    jQuery(function(){
+      var getSelectBox = function(){
+        return $("#devices_grid").find('input[name^=ids]:checked');
+      };
+      //新建单位
+      $('.devices_control input[name=add]').click(function(){
+        $("#enterprise_form").attr("action","/freed_report/ult_report_models/new").submit();
+      });
+       //删除规则
+      var form = $('#enterprise_form');
+      $(".actions input[name=delete]").click(function(){
+        if(getSelectBox().length>0){
+          if(confirm("确认删除这些模版？"))
+            form.attr("action","<%= url_for(:action => 'destroy') %>").submit();
+        }else{
+          alert("请选择需要删除的模版")
+          return;
+        }
+      });
+    });
+  </script>
+<% end %>
+<div class="users">
+  <% content_for :header_title, "编写SQL模版列表" %>
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <div class="control clearfix">
+    <p class="actions devices_control">
+      <%= tag('input',:type =>'button',:value =>'新建',:name => 'add', :class =>controlled("freed_report/ult_report_models/new")) %>
+      <%= tag('input',:type =>'button',:value =>'删除',:name => 'delete',:class =>controlled("freed_report/ult_report_models/destroy"))%>
+    </p>
+    <div class="filters">
+      <table>
+        <tr>
+          <td>
+            <%= tag('input', :type => 'hidden',:value => @current_user.login ,:name => 'login', :id => 'login') %>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <%
+  sort_url = params.merge({:page => nil})
+%>
+  <div id="devices_grid">
+   <%time_grans={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月","all"=>"全部"}%>
+   <%area_grans={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+    <% form_tag(url_for(:action => 'edit'), :method=>:post ,:id =>'enterprise_form') do%>
+      <% ui_grid_for @grid do |g, cols, data| %>
+        <% g.head do %>
+          <% g.r do %>
+            <%= g.h check_box_tag('select_all'), :class =>"ui-grid-select" %>
+            <%= g.h "", :style => 'width:140px' %>
+            <%= g.format_sort(:systype, "报表ID",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:systype, "报表类型",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:p_status, "报表标题",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:kpi,"时间粒度", :html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:p_alarmtitle,"地域粒度", :html => {:width => nil}, :url =>sort_url) %>
+          <% end %>
+        <% end %>
+        <% g.body do %>
+          <% if data.size >0 %>
+            <% data.each do |d| %>
+                <% g.r do %>
+                  <% if d.user_id == @current_user.id || @current_user.id == 1 %>
+                    <%= g.d check_box_tag('ids['+d.id.to_s+']'),:class => "ui-grid-select" %>
+                  <% else %>
+                    <%= g.d "" %>
+                  <%end%>
+                  <% g.d :class =>"ui-grid-actions" ,:style=>"width:120px"do %>
+                    <%= link_to ui_icon('pencil'), {:action => 'edit',:id => d.id},{:method => :post, :title => "编辑",:class =>controlled("freed_report/ult_report_models/edit")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('close'), {:action => 'destroy',:id => d.id},{:method => :post, :title => "删除",:class =>controlled("freed_report/ult_report_models/destroy")}, {:class => 'destroy'} %>
+                    <%= link_to ui_icon('show'), {:action => 'mark_targs',:id => d.id},{:method => :post, :title => "配置检索",:class =>controlled("freed_report/ult_report_models/mark_targs")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('close'), {:action => 'new',:from_report_model_id => d.id},{:method => :post, :title => "配置撰取",:class =>controlled("freed_report/ult_report_models/new")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('plus'), {:controller=>"freed_report/ultra_company_charts",:action => 'add_report_chart',:ult_report_model_id => d.id},{:method => :post, :title => "配置图表",:class =>controlled("freed_report/ultra_company_charts/add_report_chart")}, {:class => 'plus'} %>
+                  <% end %>
+                  <%=g.d d[:id] %>         
+                  <%=g.d d[:systype] %>
+                  <%=g.d d[:name] %>
+                  <%=g.d time_grans[d[:time_gran]] %>
+                  <%=g.d area_grans[d[:area_gran]] %>
+               <% end %>
+            <% end %>
+          <%else%>
+            <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

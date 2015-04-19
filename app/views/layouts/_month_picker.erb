@@ -1,0 +1,20 @@
+<select name="<%=name%>" style="<%=style%>" id="<%=id%>">
+  <%now = Date.current%>
+  <%last_year = Date.current - 1.years%>
+  <optgroup label="<%=now.strftime("%Y") + "年" %>" >
+    <% for months in 0..(now.strftime("%m").to_i - 1) %>
+      <option value="<%=(now.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") %>"
+          <% if (now.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") == selected_month %>selected<% end %>>
+        <%=(now.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") %>
+      </option>
+    <% end %>
+  </optgroup>
+  <optgroup label ="<%=last_year.strftime("%Y") + "年" %>">
+    <% for months in 0..11 %>
+      <option value="<%= (last_year.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") %>"
+        <% if (last_year.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") == selected_month %>selected<% end %>>
+        <%= (last_year.at_beginning_of_year + months.months).to_date.strftime("%Y-%m") %>
+      </option>
+    <% end %>
+  </optgroup>
+</select>

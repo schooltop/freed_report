@@ -1,0 +1,172 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title></title>
+<script type="text/javascript">
+    function myfun(){
+        var doc = window.parent.document;
+        //获取父窗口隐藏传参
+        var hidden_title= doc.getElementById('hide_title').value.substring(6);
+        //查找父窗口对应值
+        var parent_text=doc.getElementById(hidden_title).value;
+        if(parent_text.substring(0,4)=="sql="){
+            document.getElementById('ms').value="s";
+            document.getElementById('more_table').style.display="none"
+            document.getElementById('name').value=parent_text.substring(4);
+        }else{
+            document.getElementById('ms').value="m";
+            document.getElementById('sql_table').style.display="none"
+            var str= new Array();
+            str=parent_text.split(",");
+            for (i=0;i<str.length ;i++ )
+            {
+              str2=str[i].split("|");
+              document.getElementById('tr'+(i+1)).style.display="block"
+              document.getElementById('hidden_all').value=str.length
+              document.getElementById('k'+(i+1)).value=str2[0];
+              if(str2[1]){
+              document.getElementById('v'+(i+1)).value=str2[1];
+              }
+             }
+        }
+    }
+    window.onload=myfun;
+</script>
+
+
+<script type="text/javascript">
+
+function change_input(n){
+  document.getElementById('ms').value=n;
+  if(n=="s"){
+  document.getElementById('sql_table').style.display="block";
+  document.getElementById('more_table').style.display="none";
+  }else{
+  document.getElementById('sql_table').style.display="none";
+  document.getElementById('more_table').style.display="block";
+  }
+}
+
+function call_str(){
+   var mystr="";
+   for (i=0;i<15;i++){
+     if (document.getElementById('tr'+(i+1)).style.display=="block"&&document.getElementById('k'+(i+1)).value.length>0&&document.getElementById('v'+(i+1)).value.length>0){
+        mystr=mystr+document.getElementById('k'+(i+1)).value+"|"+document.getElementById('v'+(i+1)).value+",";
+     }
+   }
+   document.getElementById('arrary_name').value=mystr
+}
+
+
+
+function minesone(n){
+    document.getElementById('tr'+n).style.display="none";
+}
+
+
+function myaddone(){
+    var call=document.getElementById('hidden_all').value;
+    document.getElementById('hidden_all').value=parseInt(call)+1;
+    add_one=document.getElementById('hidden_all').value;
+    document.getElementById('tr'+add_one).style.display="block";
+}
+</script>
+
+
+
+<script>
+    function p_back(){
+        var ms=document.getElementById('ms').value;
+        if (ms=="s"){
+            var n=document.getElementById('name').value;
+            var doc = window.parent.document;
+            var hidden_title= doc.getElementById('hide_title').value.substring(6);
+            doc.getElementById(hidden_title).value="sql="+n;
+        }else{
+            var mystr="";
+               for (i=0;i<31;i++){
+                 if (document.getElementById('tr'+(i+1)).style.display=="block"&&document.getElementById('k'+(i+1)).value.length>0&&document.getElementById('v'+(i+1)).value.length>0){
+                    mystr=mystr+document.getElementById('k'+(i+1)).value+"|"+document.getElementById('v'+(i+1)).value+",";
+                 }
+               }
+            var doc = window.parent.document;
+            var hidden_title= doc.getElementById('hide_title').value.substring(6);
+            doc.getElementById(hidden_title).value=mystr;
+        }
+        parent.g_close_pop();
+    }
+</script>
+
+<style type="text/css">
+<!--
+body {
+    font-size: 12px;
+    margin: 40px;
+    line-height: 24px;
+}
+table  { border-collapse: collapse; }
+td {
+    width:250px;
+    border: #ccc 1px solid;
+    line-height:22px;
+}
+th{ width:250px; 
+    line-height: 28px;
+    background-color: #eee;
+    border: #ccc 1px solid;
+}
+-->
+</style>
+<script>
+    function setData(name, addr, age) {
+        var doc = window.parent.document;
+        var hidden_title= doc.getElementById('hide_title').value.substring(6);
+        doc.getElementById(hidden_title).value=name;
+    }
+</script>
+</head>
+<body>
+<button onclick="change_input('s')">SQL数据源</button><button onclick="change_input('m')">手动数据源</button>
+<input type="hidden" id="ms" value="m">
+
+<table width="400" align="center" cellpadding="0" cellspacing="0" id="sql_table" >
+  <tr>
+    <th align="center"><strong>SQL脚本</strong></th>
+  </tr>
+  <tr>
+    <td align="center">
+      
+      <textarea id="name" style="width:393px;height:120px;"></textarea>
+
+      <br/><button onclick="p_back()">提交</button></td>
+  </tr>
+</table>
+
+<table width="400" align="center" cellpadding="0" cellspacing="0" id="more_table">
+  <input type="hidden" id="hidden_all" value=1>
+  <input type="hidden" id="arrary_name">
+
+  <tr>
+    <th cospand="3" align="center"><strong>显示值</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>参数值</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>操作</strong></th>
+  </tr>
+  
+  <tr id="tr1" style="display:block">
+    <td align="center"><input type="text" id="k1" value="" style="width:165px"></td>
+    <td align="center"><input type="text" id="v1" value="" style="width:165px"></td>
+    <td align="center"><button onclick="minesone(1)">减</button></td>
+  </tr>
+
+  <%30.times do |i|%>
+  <tr id="tr<%=i+2%>" style="display:none">
+    <td align="center"><input type="text" id="k<%=i+2%>" style="width:165px"></td>
+    <td align="center"><input type="text" id="v<%=i+2%>" style="width:165px"></td>
+    <td align="center"><button onclick="minesone(<%=i+2%>)">减</button></td>
+  </tr>
+  <%end%>
+  <tr>
+      <td cospand="3"><button onclick="p_back()">提交</button><button onclick="myaddone()" style="float:right;">添加</button></td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+  <%@childs=ConfigInfo.find_by_sql("select * from config_infos where nodedn like '%#{@parent.nodedn}%' and nodetype=8")%>
+     <%m=0%>
+  <%for @child in @childs%>
+      <%m+=1%>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <%if m==@childs.size%>
+          <%if @parent.cityid==@parents.last.cityid%>
+          <img src='/javascripts/ui/external/dynatree/skin/ltL_ne.gif'>
+          <%else%>
+          <img src='/javascripts/ui/external/dynatree/skin/ltL_nes.gif'>
+          <%end%>
+          <img src='/javascripts/ui/external/dynatree/skin/ltD_ne.gif'>
+      <%else%>
+          <img src='/javascripts/ui/external/dynatree/skin/ltL_nes.gif'>
+          <img src='/javascripts/ui/external/dynatree/skin/ltD_nes.gif'>
+      <%end%>
+      <%if params[:acare]&&params[:acare][:myac_ids].include?(@child.nodedn)%>
+          <input type="checkbox"  id="acare_myac_ids_<%=@child.nodedn%>" name="cityare[myac_ids][]" checked="checked" onclick="textbook('<%=@child.nodecn%>','<%=@child.nodedn%>');"/>
+      <%else%>
+          <input type="checkbox"  id="acare_myac_ids_<%=@child.nodedn%>" name="cityare[myac_ids][]" onclick="textbook('<%=@child.nodecn%>','<%=@child.nodedn%>');"/>
+      <%end%>
+      <%= @child.nodecn %> </br>
+   <%end%>

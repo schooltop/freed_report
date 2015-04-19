@@ -1,0 +1,262 @@
+
+<%content_for :head do %>
+  <%=javascript_include_tag 'jquery.progressbar.min.js' %>
+ <%= stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js" %>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js" %>
+  <%= stylesheet_link_tag "ui/ui/ui.slider.css" %>
+  <%= javascript_include_tag "ui/ui/ui.slider.js"%>
+  <%= javascript_include_tag "timepicker.js"%>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <%= javascript_include_tag "timepicker.js"%>
+
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.cluetip' %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.hoverIntent.js' %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js"%>
+  <%= javascript_include_tag "ui/ui/ui.slider.js"%>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js"%>
+
+<%=javascript_include_tag 'ui/external/cluetip/jquery.cluetip' %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.hoverIntent.js' %>
+  <%#=javascript_include_tag 'My97DatePicker/WdatePicker.js' %>
+  <%= stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= stylesheet_link_tag "ui/ui/ui.slider.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js"%>
+  <%= javascript_include_tag "ui/ui/ui.slider.js"%>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js"%>
+  <%= javascript_include_tag "timepicker.js"%>
+  <%= javascript_include_tag 'ui/external/form/jquery.form' %>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <%=javascript_include_tag 'ui/ui/jquery.autocomplete'%>
+
+  <style type="text/css">
+    .ui-grid-scrollable TABLE{
+      width:100%;
+    }
+  </style>
+
+<script type="text/javascript">
+    $(function(){
+      var actions =$("#control .actions"),form = $('#event-grid');
+      form.submit(function(){
+        var ids = form.find('input[name^=ids]:checked');
+        if(!ids.length){
+          alert('请至少选择一个告警。');
+          return false;
+        }
+        else if(confirm('确定操作所选告警?')){
+          return true;
+        }
+        return false;
+      });
+      actions.children('input[name=delete]').click(function(){
+        form.attr('action',"/fault/histories/destory").submit();
+      });
+
+      $(".alarm-detail").cluetip({
+        width: 420,
+        cluetipClass: 'jtip',
+        arrows: true,
+        dropShadow: false,
+        hoverIntent: {
+          sensitivity : 3,
+          interval : 1000,
+          timeout : 2000
+        },
+        sticky: true,
+        mouseOutClose: true,
+        titleAttribute: 'detail_title',
+        closePosition: 'title',
+        closeText: '<img src="/images/cross.png" alt="关闭" />'
+      });
+      function customRange(input){
+        return {
+          minDate: (input.id == "end_time" ? $("#begin_time").datepicker("getDate") : null),
+          maxDate: (input.id == "begin_time" ? $("#end_time").datepicker("getDate") : null),
+          minDate: (input.id == "clear_end" ? $("#clear_start").datepicker("getDate") : null),
+          maxDate: (input.id == "clear_start" ? $("#clear_end").datepicker("getDate") : null)
+        };
+      }
+      $('#begin_time,#end_time,#clear_start,#clear_end').datepicker({
+        duration: '',
+        showTime: true,
+        constrainInput: false,
+        stepMinutes: 1,
+        stepHours: 1,
+        altTimeField: '',
+        time24h: true,
+        howStatus: true,
+        beforeShow: customRange
+      });
+      $("#range_start").datepicker($.extend({}, $.datepicker.regional["zh-CN"], {
+        showStatus: true,
+        beforeShow: customRange
+      }));
+      $("#expand_show").click(function(){
+        $(".expand").slideDown();
+        $("#expand_show").hide();
+        $("#expand_hide").show();
+      });
+      $("#expand_hide").click(function(){
+        $(".expand").slideUp();
+        $("#expand_show").show();
+        $("#expand_hide").hide();
+      })
+    });
+    function creset(){
+      $("#ossCity,#ossDistrict,#ossSite,#event_con_alarm_source,\n\
+          #begin_time,#end_time,#range_start,#event_con_severity_level,\n\
+          #event_con_alarm_name,#0sel_area,#1sel_area,#2sel_area,#clear_start,#clear_end").not($(".ui-state-disabled")).attr("value",'');
+    }
+  </script>
+
+<%end%>
+<style type="text/css">
+.event-statistics-grid2 table{
+    background-color:#EBECEE;
+	  }
+  .event-statistics-grid2 tr{
+    margin-left:10px;
+	 background-color:#FFFFFF;
+  }
+  .hi{
+    background:url(../images/default/grid/grid3-hrow.gif) repeat-x  bottom #f9f9f9;
+    font:11px/15px tahoma,arial,verdana,sans-serif;
+    padding:0px 2px 0px 2px;
+    width: 13%;
+    height:25px;
+    margin-bottom:1px;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .event-statistics-grid2 th.header {
+    cursor: pointer;
+    color: #1c6280;
+    width: 13%;
+  }
+
+  .event-statistics-grid2 td{
+    font:12px/15px tahoma,arial,verdana,sans-serif;
+    height:20px;
+    padding:0px 2px 0px 2px;
+    text-align:center;
+  }
+</style>
+
+<body>
+
+  <%content_for :header_title do %>
+  <%=@freed_report_name%>
+  <%end %>
+
+ <%=render :partial=>"report_forms"%>
+
+<br/>
+
+<%#---------图表展示--------------%>
+<%@model_charts=@current_model.ultra_company_charts%>
+<%if @model_charts&&@model_charts.size>2%>
+<div id="current_chart_tab">
+  <%=javascript_include_tag  'prototype' %>
+  <script>
+     function check_work(n){
+      jQuery(".report_charts").css('color',"#000000");
+      document.getElementById(n).style.color="#f59b45";
+      new Ajax.Updater('checkwork', '/freed_report/ultra_company_charts/check_report_chart?ultra_company_chart_id='+n, {asynchronous:true, evalScripts:true});}
+  </script>
+  <%for chart in @model_charts%>
+     <%if params[:ultra_company_chart_id]&&params[:ultra_company_chart_id]==chart.id.to_s%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%elsif !params[:ultra_company_chart_id]&&chart==@charts[0]%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%else%>
+       <input id="<%=chart.id%>"name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>"  style="color:#000000;" >
+     <%end%>
+  <%end%>
+  <div id="checkwork"><%=render :partial => 'freed_report_chart_partial'%></div>
+</div>
+<%elsif @model_charts&&@model_charts.size==2%>
+<div id="current_chart_left">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<div id="current_chart_right">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<%elsif @model_charts&&@model_charts.size==1%>
+<div id="current_chart">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<%end%>
+
+<%#------------报表展示-------------------------%>
+<div id="device_grid">
+ <%  @grid.column_names.size > 10 ? scrollable =true : scrollable =false
+  ui_grid_for @grid,:scrollable =>scrollable do |g,cols,data|
+ %>
+  <%@columns=@columns-@hidden_columns%>
+  <%sort_url = params.merge({:page => nil})%>
+  <div style="float:right;margin-right:10px "><%= export_to 'csv', "CSV", params %></div>
+      <% g.head do %>
+            <% g.r do %>
+              <%for item in @columns%>
+                  <%= g.format_sort(item,item, :html => {:width =>"125px"}, :url =>sort_url) %>
+              <%end%>
+            <% end %>
+      <% end %>
+
+      <% g.body do %>
+        <% if data.size >0 %>
+           <% data.each do |d| %>
+                <% g.r do %>
+                  <%for item in @columns%>
+                    <%if item.include?("数") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_i)%>
+                     <%elsif item.include?("率") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].nil? ? "": d[item].to_f)%>
+                     <%elsif item.include?("占比") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].nil? ? "": d[item].to_f)%>
+                     <%elsif item.include?("时间") %>
+                      <%if @current_model.time_gran&&@current_model.time_gran=="month"%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m') )%>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="week" %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m %W') )%>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="hour" %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m-%d %H') )%>
+                      <%else%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m-%d'))%>
+                      <%end%>
+                     <%else%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item])%>
+                     <%end%>
+                  <%end%>
+                <% end %>
+            <% end %>
+        <% else %>
+            <td colspan="<%= 2+cols.size %>">
+              当前没有数据。</td>
+        <% end %>
+      <% end %>
+<% end %>
+
+  <% if !@page_ult_freed_reports.nil? && @page_ult_freed_reports.length > 0 %>
+    <div style="margin-top:0.5em;" class="clearfix">
+      <div class="left f4">显示<%=@ult_freed_reports.total_entries %>个结果中的<%=@ult_freed_reports.current_page == @ult_freed_reports.page_count ? (@ult_freed_reports.total_entries - @ult_freed_reports.per_page * (@ult_freed_reports.page_count - 1)): @ult_freed_reports.per_page %>个</div>
+      <%=will_paginate @ult_freed_reports %>
+    </div>
+  <% end %>
+
+
+</div>
+</body>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $("div.event-statistics-grid2 table tr").mouseover(function(){
+    $(this).css("background-color","#f1f2f4");
+  });
+  $("div.event-statistics-grid2 table tr").mouseout(function(){
+    $(this).css("background-color","#ffffff");
+  });
+});
+</script>

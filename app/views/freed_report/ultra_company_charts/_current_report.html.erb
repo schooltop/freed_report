@@ -1,0 +1,172 @@
+<div id="current_chart" style="margin-left:-408px; ">
+  <%require "freed_report/fusioncharts_helper"%>
+  <%=javascript_include_tag "FusionCharts.js"%>
+  <%if @ultra_company_chart&&@ultra_company_chart.id%>
+      <%freed_report_chart(@ultra_company_chart.action_title,710)%>
+  <%end%>
+</div><br/><br/>
+
+ <style type="text/css">
+  #chart_attr{display:none;}
+  #report_data{display:none;}
+  #chart_data{display:none;}
+ </style>
+ <script>
+    function check_chart(){
+    var chart_style_id=jQuery("#ultra_company_chart_ultra_company_chart_style_id").find("option:selected").val();
+
+    $.ajax({
+      type: "POST",
+      url:  "/freed_report/ultra_company_charts/change_current_chart_demo?ultra_company_chart_style_id="+chart_style_id,
+      dataType:"text",
+      success: function(msg){
+        $("#hidden_chart_demo").empty();
+        $("#hidden_chart_demo").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+
+
+    $.ajax({
+      type: "POST",
+      url:  '/freed_report/ultra_company_charts/change_current_chart_attr?ultra_company_chart_style_id='+chart_style_id,
+      dataType:"text",
+      success: function(msg){
+        $("#chart_attr").empty();
+        $("#chart_attr").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+    jQuery("#chart_attr").show('slow');
+    jQuery("#hidden_chart_demo").show('slow');
+    }
+
+    function check_data(){
+    var chart_db_source=jQuery("#ultra_company_chart_da_source  option:selected").val();
+    if (chart_db_source==1){
+      jQuery("#report_data").show('slow');
+    }else{
+      jQuery("#report_data").hide('slow');}
+    if (chart_db_source==2){
+      jQuery("#chart_data").show('slow');
+    }else{
+      jQuery("#chart_data").hide('slow');}
+    }
+
+    function check_report_data(){
+    var chart_report_id=jQuery("#ultra_company_chart_ult_report_model_id").find("option:selected").val();
+    
+    $.ajax({
+      type: "POST",
+      url:  '/freed_report/ultra_company_charts/change_current_chart_data?db_source=1'+'&ult_report_model_id='+chart_report_id,
+      dataType:"text",
+      success: function(msg){
+        $("#sql_text").empty();
+        $("#sql_text").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+    }
+
+    function check_chart_data(){
+    var chart_parent_id=jQuery("#ultra_company_chart_parent_id").find("option:selected").val();
+
+    $.ajax({
+      type: "POST",
+      url:  '/freed_report/ultra_company_charts/change_current_chart_data?db_source=2'+'&ultra_company_chart_id='+chart_parent_id ,
+      dataType:"text",
+      success: function(msg){
+        $("#sql_text").empty();
+        $("#sql_text").append(msg);
+      },
+      error: function(msg){
+      }
+    });
+    }
+
+ </script>
+
+  <%# form_remote_tag  :url=>{:controller=>"freed_report/ultra_company_charts",:action=>"creat_report_chart"},:html=>{:class => "form ui-widget"},:update=>'current_chart' do -%>
+  <% form_tag(url_for(:controller=>"freed_report/ultra_company_charts",:action=>"creat_report_chart"), :method=>:post ,:id =>'enterprise_form',:class => "form ui-widget") do%>
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <%=hidden_field_tag "ult_report_model_id",@ult_report_model.id  if @ult_report_model%>
+  <%=hidden_field_tag "ultra_company_chart_id",@ultra_company_chart.id if @ultra_company_chart.id%>
+  <% field_set_tag nil, :style => "padding: 1em;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class="wrap">
+        <div class="li">
+          <div>
+             <%= label_tag :begin_time,"图类选择：", :class=>'label',:style=>"width:90px;" %>
+             <%=select :ultra_company_chart,:ultra_company_chart_style_id ,FreedReport::UltraCompanyChartStyle.all.collect{|c|[c.name,c.id.to_s]},{:include_blank => "新建",:selected=>"#{params[:ultra_company_chart_style_id]}"},:onchange=>"check_chart()"%>
+          </div>
+        </div>
+
+      <div class="li" id="chart_attr" style=<%="display:block;" if params[:chart_attributes]&&params[:chart_attributes]!=""%>>
+          <div>
+             <%= concat label_tag :chart_attributes,"图表属性：", :class=>'label',:style=>"width:90px;"
+              text_field_tag "chart_attributes",params[:chart_attributes],:id=>'chart_attributes',:style=>"width:590px;"
+             %>
+          </div>
+        </div>
+
+        <div class="li">
+          <div class="col left">
+             <%=concat label_tag :name,"图表名称：", :class=>'label',:style=>"width:90px;"
+              text_field_tag "name",params[:name],:id=>'name'
+             %>
+          </div>
+          <div class="col right">
+             <%= label_tag :begin_time,"图表列值：", :class=>'label',:style=>"width:90px;"%>
+             <%= text_field_tag "chart_x",params[:chart_x],:id=>'chart_x'%>
+          </div>
+        </div>
+
+        <div class="li">
+          <div class="col left">
+             <%=concat label_tag :name,"图表X轴：", :class=>'label',:style=>"width:90px;"
+              text_field_tag "chart_row",params[:chart_row],:id=>'chart_row'
+             %>
+          </div>
+          <div class="col right">
+             <%= label_tag :begin_time,"图表附轴：", :class=>'label',:style=>"width:90px;"%>
+             <%= text_field_tag "chart_xs",params[:chart_xs],:id=>'chart_xs'%>
+          </div>
+        </div>
+
+      <%#*<div class="li">%>
+          <%#*<div  class="col left">%>
+            <%#= label_tag :begin_time,"数据源选择：", :class=>'label',:style=>"width:90px;" %>
+            <%#=select :ultra_company_chart,:da_source,[['报表sql','1'],['父图sql','2'],['自有sql','3']],{:include_blank => "选择数据源",:selected=>"#{params[:da_source]}"},:onchange=>"check_data()"%>
+          <%#*</div>%>
+         <%#*<div class="col right" id="report_data" style=<%="display:block;" if params[:ult_report_model_id]&&params[:ult_report_model_id]!=""&&params[:da_source]==1%>
+             <%#@times={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月","all"=>"全部"}%>
+             <%#@areas={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+             <%#= label_tag :begin_time,"报表数据源：", :class=>'label',:style=>"width:90px;"%>
+             <%#=select :ultra_company_chart,:ult_report_model_id,FreedReport::UltReportModel.find(:all,:order=>"name desc,area_gran,time_gran").collect{|c| [c.name.to_s+(c.area_gran ? "(" : "")+@areas[c.area_gran].to_s+(c.area_gran ? "," : "")+@times[c.time_gran].to_s+(c.area_gran ? ")" : ""),c.id.to_s]},{:include_blank => "选择报表数据源",:selected=>"#{params[:ult_report_model_id]}"},:onchange=>"check_report_data()"%>
+         <%#*</div>%>
+         <%#*<div class="col right" id="chart_data" style=<%="display:block;" if params[:parent_id]&&params[:parent_id]!=""&&params[:da_source]==2%>
+             <%#= label_tag :begin_time,"父图数据源：", :class=>'label',:style=>"width:90px;"%>
+             <%#=select :ultra_company_chart,:parent_id,FreedReport::UltraCompanyChart.find(:all,:conditions=>"parent_id=0",:order=>"name desc").collect{|c| [c.name,c.id.to_s]},{:include_blank => "选择父图数据源",:selected=>"#{params[:parent_id]}"},:onchange=>"check_chart_data()"%>
+          <%#*</div>%>
+      <%#*</div>%>
+
+      <div class="li" id="sql_text">
+          <div>
+             <%= concat label_tag :chart_sql,"数据源脚本：", :class=>'label',:style=>"width:90px;"
+              text_area_tag "chart_sql",params[:chart_sql],:id=>'chart_sql',:style=>"width:590px; height: 183px;"
+             %>
+          </div>
+       </div
+    </div>
+
+    <div class="li" align="center">
+        <%= submit_tag '确定' %>
+        <%=link_button_to "删除", {:controller=>"ultra_company_charts", :action=>"delete_report_chart",:id=>@ultra_company_chart.id}%>
+        <%=link_button_to "返回列表", params.except(:authenticity_token,:id).merge!({:controller=>:ultra_company_charts, :action=>:index})%>
+    </div>
+  <% end %>
+<% end %>
+
+

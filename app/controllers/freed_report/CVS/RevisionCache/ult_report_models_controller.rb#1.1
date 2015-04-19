@@ -1,0 +1,308 @@
+class  FreedReport::UltReportModelsController < ApplicationController   #前置报表模版配置功能--2013-12-31版--李江锋ljf
+  menu_item "SQL报表"
+  sidebar "ultra"
+  include DbSql
+
+  def index
+    #session[:sys_tab]="配置"
+    #session[:site_tab]="freed_reportult_report_models"
+    submenu_item "common_report"
+    @ult_report_model = FreedReport::UltReportModel.find_by_sql("select * from ult_report_models where top_style<>1 order by id desc ")
+    @grid = UI::Grid.new(FreedReport::UltReportModel, @ult_report_model)
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @ult_report_model }
+    end
+  end
+
+  def new
+    submenu_item "common_report"
+    if params[:param]
+    params[:ult_report_model]=params[:param][:ult_report_model]
+    params[:db_name]=params[:param][:db_name]
+    params[:db_user]=params[:param][:db_user]
+    params[:db_style]=params[:param][:db_style]
+    params[:db_password]=params[:param][:db_password]
+    params[:db_port]=params[:param][:db_port]
+    params[:db_host]=params[:param][:db_host]
+    params[:db_service]=params[:param][:db_service]
+    params[:menu]=params[:param][:menu]
+    end  
+    @ult_report_model = FreedReport::UltReportModel.new
+    respond_to do |format|
+      format.html #new.html.erb
+      format.xml {render :xml => @ult_report_model}
+    end
+  end
+
+   def create
+     if params[:ult_report_model]
+       if params[:ult_report_model][:str_sql].to_s.include?"delete"
+         flash[:notice] ="报表模版创建失败，sql脚本中包含非法字符delete！"
+         redirect_to :action => 'new',:param=>params
+       else
+            @un_conn_message=""          
+            begin
+              db_connects("#{params[:db_style]}",config_db_con(params["db_host"],params["db_port"],params["db_service"],"#{params[:db_style]}"),params["db_user"],params["db_password"])
+            rescue
+              @un_conn_message += "报表数据源配置有问题，请测试；"
+            end
+            begin
+              @dbh.execute("#{content_message(params[:ult_report_model][:str_sql])}")
+              create_report
+              flash[:notice] ="报表模版创建成功。如需搜索选项，请完善检索配置，或点击<a href='/freed_report/ult_freed_reports?report_id=#{@ult_report_model.id}'>[查看报表]</a>前往查看报表结果。"
+              redirect_to :action => 'mark_targs' ,:id=>@ult_report_model.id
+            rescue
+              @un_conn_message +="请编写sql脚本；"  if params[:ult_report_model][:str_sql].to_s.include?"填写sql脚本注意事项"
+              flash[:notice] = @un_conn_message+"报表模版sql语句有问题，请测试。"
+              redirect_to :action => 'new',:param=>params
+            end
+            @dbh.disconnect if @dbh
+       end
+     end
+   end
+
+  def create_report
+            @ult_report_model = FreedReport::UltReportModel.new(params[:ult_report_model])
+            @ult_report_model.user_id=current_user.id
+            @ult_report_model.top_style=0 
+            @ult_report_model.systype="SQL报表"
+            @ult_report_model.ultra_company_db_model_id=""
+            @ult_report_model.save
+            check_db_model
+            @ult_report_model.ultra_company_db_model_id=@db_model.id
+            @ult_report_model.save
+            @tabmenu=FreedReport::Tabmenu.new
+            @tabmenu.name=@ult_report_model.name
+            @tabmenu.modelname="SQL报表"
+            @tabmenu.top_style=0
+            @tabmenu.url="freed_report/ult_freed_reports?report_id=#{@ult_report_model.id}"
+            @tabmenu.parent_id="#{params[:menu]}"
+            @tabmenu.user_id=current_user.id
+            @tabmenu.ult_report_model_id=@ult_report_model.id
+            @tabmenu.save
+   end
+
+   def check_db_model #配置数据模型数据源
+     @db_model=FreedReport::UltraCompanyDbModel.find(:last,:conditions=>"db_name='#{params[:db_name]}'")
+     @db_model=FreedReport::UltraCompanyDbModel.new unless @db_model
+     @db_model.db_style="#{params[:db_style]}"
+     @db_model.db_name=params["db_name"]
+     @db_model.db_user=params["db_user"]
+     @db_model.db_password=params["db_password"]
+     @db_model.db_port=params["db_port"]
+     @db_model.db_host=params["db_host"]
+     @db_model.db_service=params["db_service"]
+     @db_model.db_con=config_db_con(params["db_host"],params["db_port"],params["db_service"],"#{params[:db_style]}")
+     @db_model.user_id=current_user.id
+     @db_model.save
+   end
+
+   def config_db_con(db_host=nil,db_port=nil,db_service=nil,db_style=nil)  #配置数据连接
+     if db_style=="oracle"
+     @db_con="(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = #{db_host})(PORT = #{db_port})))(CONNECT_DATA =(SERVICE_NAME = #{db_service})(SERVER = DEDICATED)))"
+     elsif db_style=="mysql"
+      @db_con="#{db_service}:#{db_host}"
+     end
+     return @db_con
+   end
+
+  def edit
+    submenu_item "common_report"
+    @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+    if @ult_report_model.ultra_company_db_model
+    @ultra_company_db_model=@ult_report_model.ultra_company_db_model
+    params[:ultra_company_db_model_id]=@ult_report_model.ultra_company_db_model_id
+    params[:db_name]=@ultra_company_db_model.db_name
+    params[:db_user]=@ultra_company_db_model.db_user
+    params[:db_style]=@ultra_company_db_model.db_style
+    params[:db_password]=@ultra_company_db_model.db_password
+    params[:db_port]=@ultra_company_db_model.db_port
+    params[:db_host]=@ultra_company_db_model.db_host
+    params[:db_service]=@ultra_company_db_model.db_service
+    params[:menu]=@ult_report_model.ultra_company_tabmenu.id
+    end
+
+    if params[:param]
+    params[:ult_report_model]=params[:param][:ult_report_model]
+    params[:db_name]=params[:param][:db_name]
+    params[:db_user]=params[:param][:db_user]
+    params[:db_style]=params[:param][:db_style]
+    params[:db_password]=params[:param][:db_password]
+    params[:db_port]=params[:param][:db_port]
+    params[:db_host]=params[:param][:db_host]
+    params[:db_service]=params[:param][:db_service]
+    params[:menu]=params[:param][:menu]
+    end
+
+    respond_to do |format|
+      format.html #edit.html.erb
+      format.xml {render :xml => @ult_report_model}
+    end
+  end
+
+   def show
+    @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+    respond_to do |format|
+      format.html #edit.html.erb
+      format.xml {render :xml => @ult_report_model}
+    end
+  end
+
+  def update
+     if params[:ult_report_model]
+       @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+         if params[:ult_report_model][:str_sql].to_s.include?"delete"
+             flash[:notice] ="报表模版创建失败，sql脚本中包含非法字符delete！"
+             redirect_to :action => 'edit',:param=>params,:id=>params[:id]
+         else
+            @un_conn_message=""
+            begin
+              db_connects("#{params[:db_style]}",config_db_con(params["db_host"],params["db_port"],params["db_service"],"#{params[:db_style]}"),params["db_user"],params["db_password"])
+            rescue
+              @un_conn_message += "报表数据源配置有问题，请测试；"
+            end
+            begin
+              @dbh.execute("#{content_message(params[:ult_report_model][:str_sql])}")
+                @ult_report_model.update_attributes(params[:ult_report_model])
+                check_db_model
+                @ult_report_model.ultra_company_db_model_id=""
+                @ult_report_model.save
+                @ult_report_model.ultra_company_db_model_id=@db_model.id.to_i
+                @ult_report_model.save
+                @tabmenu=FreedReport::Tabmenu.find(:last,:conditions=>"ult_report_model_id=#{@ult_report_model.id}")
+                @tabmenu.update_attributes(:parent_id=>"#{params[:menu]}")
+                flash[:notice] ="报表模版修改成功"
+                redirect_to :controller=>"freed_report/ult_freed_reports",:action => 'index' ,:report_id=>@ult_report_model.id
+            rescue
+              @un_conn_message +="请编写sql脚本；"  if params[:ult_report_model][:str_sql].to_s.include?"填写sql脚本注意事项"
+              flash[:notice] = @un_conn_message+"报表模版sql语句有问题，请测试。"
+              redirect_to :action => 'edit',:param=>params,:id=>params[:id]
+            end
+            @dbh.disconnect if @dbh
+       end
+     end
+     
+  end
+  
+
+  def destroy
+     if params[:ids]
+       @ult_report_models = FreedReport::UltReportModel.find(params[:ids].keys)
+       @ult_report_models.each do |@ult_report_model|
+         @ult_report_model.update_attributes(:top_style=>1)
+         tabmenu=FreedReport::Tabmenu.find_by_name("#{@ult_report_model.name}")
+         tabmenu.update_attributes(:top_style=>1) if tabmenu
+       end
+     else
+         @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+         @ult_report_model.update_attributes(:top_style=>1)
+         tabmenu=FreedReport::Tabmenu.find_by_name("#{@ult_report_model.name}")
+         tabmenu.update_attributes(:top_style=>1) if tabmenu
+     end
+     flash[:notice] ="报表模版删除成功"
+     redirect_to :action => 'index'
+  end
+
+  def mark_targs #搜索条件配置
+      submenu_item "common_report"
+      @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+      @my_params_first=@ult_report_model.form_title.split("￥") if @ult_report_model.form_title&&@ult_report_model.form_title!=""
+  end
+
+  def mark_create #检索配置更新
+      @ult_report_model = FreedReport::UltReportModel.find(params[:id])
+      @ultra_company_db_model=@ult_report_model.ultra_company_db_model
+      @sql=params[:ult_report_model][:str_sql]
+      @params_sql=params[:ult_report_model][:str_sql].dup
+      @collect_items=params[:collect_item]
+      @form_title=""
+      @check_titles=[]
+      @collect_items.each do|c|
+        if c["name"]!=""&&c["cname"]!=""&&c["cname"]!="地市名称(测试)"
+        @form_title=@form_title+c["name"].lstrip+"#"+c["cname"].lstrip+"#"+c["singer"]+"#"+c["style"]+"#"+c["source"].lstrip+"#"+c["check"].lstrip+"￥"
+        @check_titles<<[c["style"],c["name"].lstrip,c["singer"],c["check"].lstrip]
+        end
+      end
+      unless @form_title==""
+      @ult_report_model.form_title=""
+      @ult_report_model.save
+      @ult_report_model.form_title="#{@form_title}"
+      @ult_report_model.save
+      end
+     begin
+      db_connects("#{@ultra_company_db_model.db_style}","#{@ultra_company_db_model.db_con}","#{@ultra_company_db_model.db_user}","#{@ultra_company_db_model.db_password}")
+      @dbh.execute("#{@sql}")
+
+      @ult_report_model.str_sql=""
+      @ult_report_model.save
+      @ult_report_model.str_sql="#{@sql}"
+      @ult_report_model.save
+
+      @db_ok=1
+      flash[:notice] ="检索配置更新成功" 
+     rescue
+      flash[:notice] = "报表模版sql语句有问题，请测试。"
+     end
+     
+    if @dbh&&@db_ok
+      flashback=[]
+      @current_model=@ult_report_model
+      for check_title in @check_titles
+        if check_title[3]&&check_title[3]!=""
+           begin
+             @dbh.execute("#{content_message(check_title[3][4..-1])}") if (check_title[0]=="select" && check_title[3][0..3]=="sql=")
+              if  check_title[0]=="time"
+              option= Time.now.strftime("%Y-%m-%d")
+              option= Time.now.strftime("%Y-%m-%d %H:%M:%S") if @ult_report_model.time_gran=="hour"
+              else
+              option="pk" #判空
+              end
+              p "1111111111111111111111111111111"
+             @chenge_sql=has_compare_option?(@sql,check_title[0],check_title[1],check_title[2],check_title[3],option)
+             p "22222222222222222222222"
+             @dbh.execute("#{content_message(@chenge_sql)}")
+             p "33333333333333333333333333333"
+           rescue
+             flashback<<check_title[1]
+             flash[:notice] = "搜索条件配置有误，请查看相关选项。"
+           end
+        else
+             flashback<<check_title[1]
+             flash[:notice] = "搜索条件配置有误，请查看必填项是否填满。"
+        end
+      end
+       if flashback==[]
+       redirect_to :controller=>"freed_report/ult_freed_reports",:action => 'index' ,:report_id=>params[:id]
+       else
+       redirect_to :action => 'mark_targs',:id=>params[:id],:str_sql=>@params_sql,:flashback=>flashback
+       end
+    else
+       redirect_to :action => 'mark_targs',:id=>params[:id],:str_sql=>@params_sql,:bad_sql=>1
+    end
+     @dbh.disconnect if @dbh
+  end
+
+
+  def check_worker#匹配数据源反馈致配置页面 ---2013-12-30---李江锋ljf
+    if params[:idnum]&&params[:idnum]!=""
+    @ultra_company_db_model=FreedReport::UltraCompanyDbModel.find(params["idnum"].to_i)
+    params[:ultra_company_db_model_id]=params[:idnum]
+    params[:db_name]=@ultra_company_db_model.db_name
+    params[:db_user]=@ultra_company_db_model.db_user
+    params[:db_style]=@ultra_company_db_model.db_style
+    params[:db_password]=@ultra_company_db_model.db_password
+    params[:db_port]=@ultra_company_db_model.db_port
+    params[:db_host]=@ultra_company_db_model.db_host
+    params[:db_service]=@ultra_company_db_model.db_service
+    end
+    render :partial => 'db_check'
+  end
+
+  def eare_check #根据所在省市定义导航起始编号
+    @eare={"cn=yunnan" =>1,"cn=ningxia" =>[38.46,106.37],"cn=chongqing"=>[29.58,106.54],"cn=zhixiashi"=>[29.58,106.54],"cn=jiangxi"=>[28.64,115.89],"cn=hunan"=>[28.16,113.02],"cn=jilin" =>[43.78,125.37],"cn=shanxi"=>[37.87,112.55],"cn=hubei"=>[30.586854,114.276123]}
+      {"cn=chongqing,c=cn"=>1,"cn=chongqing1,c=cn"=>5000}
+  end
+
+end
+

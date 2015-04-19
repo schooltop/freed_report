@@ -1,0 +1,149 @@
+
+  <% content_for :head do %>
+  <style type="text/css">
+    .enterprises{
+    }
+  </style>
+  <script type="text/javascript">
+    jQuery(function(){
+      var getSelectBox = function(){
+        return $("#devices_grid").find('input[name^=ids]:checked');
+      };
+      //新建单位
+      $('.devices_control input[name=add]').click(function(){
+        $("#enterprise_form").attr("action","/freed_report/ult_report_models/new").submit();
+      });
+       //删除规则
+      var form = $('#enterprise_form');
+      $(".actions input[name=delete]").click(function(){
+        if(getSelectBox().length>0){
+          if(confirm("确认删除这些模版？"))
+            form.attr("action","<%= url_for(:action => 'destroy') %>").submit();
+        }else{
+          alert("请选择需要删除的模版")
+          return;
+        }
+      });
+    });
+  </script>
+
+
+  <%= stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js" %>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js" %>
+  <%= stylesheet_link_tag "ui/ui/ui.slider.css" %>
+  <%= javascript_include_tag "ui/ui/ui.slider.js"%>
+  <%= javascript_include_tag "timepicker.js"%>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <script type="text/javascript">
+  function check_date(){
+    $('#created_at').datepicker({showButtonPanel: true,selectState:false,changeMonth:true,changeYear:true,hideReset:false});
+    };
+</script>
+
+<% end %>
+<div class="users">
+  <% content_for :header_title, "编写SQL模版列表" %>
+
+<% form_for :ult_report_model,@ult_report_model,:url =>{:controller=>'freed_report/ult_report_models'}, :html=>{:class => "form ui-widget", :method=>:get} do |f| %>
+    <%= ui_error(f.error_messages) unless f.error_messages.empty? %>
+    <% field_set_tag "检索条件", :style => "font-size:12px;padding: 1em;background:transparent;", :class => "ui-widget-content ui-corner-all" do %>
+    <div class="wrap">
+        <div class="li">
+            <div class="col left">
+               <%=f.label :time_gran, "报表名称", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%= text_field_tag "name", {},:style=>"width:140px;margin-right:2px;" ,:value=>params[:name],:style => "width:256px;"%>
+            </div>
+            <div class="col right">
+               <%=f.label :menu, "创建时间", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%=text_field_tag "created_at",params[:created_at],:id=>'created_at',:size=>7,:style=>"width:256px;",:value =>params[:created_at],:onclick=>"check_date()",:onmouseover=>"check_date()"%>          
+            </div>
+        </div>
+        <div class="li">
+            <div class="col left">
+               <%=f.label :time_gran, "时间粒度", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%=select( "time_gran","",[["小时","hour"],["日","day"],["周","week"],["月","month"],["全部","all"]],{:include_blank => "选择时间粒度",:selected=>params[:time_gran]},:style => "width:262px;")%>
+            </div>
+            <div class="col right">
+               <%=f.label :area_gran, "区域粒度", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%=select( "area_gran","",[["省份","province"],["地市","city"],["郊县","town"],["交换机","sw"],["AC","ac"],["AP","ap"]],{:include_blank => "选择区域粒度",:selected=>params[:area_gran]},:style => "width:262px;")%>
+            </div>
+        </div>
+    </div>
+   <div class="actions devices_control" style="float:right">
+      <%=f.submit "确定"%>
+   </div>
+    <% end %>
+  <%end%>
+
+
+
+  <%= ui_highlight flash[:notice] unless flash[:notice].nil? %>
+  <div class="control clearfix">
+    <p class="actions devices_control">
+      <%= tag('input',:type =>'button',:value =>'新建',:name => 'add', :class =>controlled("freed_report/ult_report_models/new")) %>
+      <%= tag('input',:type =>'button',:value =>'删除',:name => 'delete',:class =>controlled("freed_report/ult_report_models/destroy"))%>
+    </p>
+    <div class="filters">
+      <table>
+        <tr>
+          <td>
+            <%= tag('input', :type => 'hidden',:value => @current_user.login ,:name => 'login', :id => 'login') %>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <%
+  sort_url = params.merge({:page => nil})
+%>
+  <div id="devices_grid">
+   <%time_grans={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月","all"=>"全部"}%>
+   <%area_grans={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+    <% form_tag(url_for(:action => 'edit'), :method=>:post ,:id =>'enterprise_form') do%>
+      <% ui_grid_for @grid do |g, cols, data| %>
+        <% g.head do %>
+          <% g.r do %>
+            <%= g.h check_box_tag('select_all'), :class =>"ui-grid-select" %>
+            <%= g.h "", :style => 'width:140px' %>
+            <%= g.format_sort(:systype, "报表ID",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:systype, "报表类型",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:p_status, "报表名称",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:p_status, "创建时间",:html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:kpi,"时间粒度", :html => {:width => nil}, :url =>sort_url) %>
+            <%= g.format_sort(:p_alarmtitle,"地域粒度", :html => {:width => nil}, :url =>sort_url) %>
+          <% end %>
+        <% end %>
+        <% g.body do %>
+          <% if data.size >0 %>
+            <% data.each do |d| %>
+                <% g.r do %>
+                  <% if d.user_id == @current_user.id || @current_user.id == 1 %>
+                    <%= g.d check_box_tag('ids['+d.id.to_s+']'),:class => "ui-grid-select" %>
+                  <% else %>
+                    <%= g.d "" %>
+                  <%end%>
+                  <% g.d :class =>"ui-grid-actions" ,:style=>"width:120px"do %>
+                    <%= link_to ui_icon('pencil'), {:action => 'edit',:id => d.id},{:method => :post, :title => "编辑",:class =>controlled("freed_report/ult_report_models/edit")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('close'), {:action => 'destroy',:id => d.id},{:method => :post, :title => "删除",:class =>controlled("freed_report/ult_report_models/destroy")}, {:class => 'destroy'} %>
+                    <%= link_to ui_icon('show'), {:action => 'mark_targs',:id => d.id},{:method => :post, :title => "配置检索",:class =>controlled("freed_report/ult_report_models/mark_targs")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('close'), {:action => 'new',:from_report_model_id => d.id},{:method => :post, :title => "配置撰取",:class =>controlled("freed_report/ult_report_models/new")}, {:class => 'edit'} %>
+                    <%= link_to ui_icon('plus'), {:controller=>"freed_report/ultra_company_charts",:action => 'add_report_chart',:ult_report_model_id => d.id},{:method => :post, :title => "配置图表",:class =>controlled("freed_report/ultra_company_charts/add_report_chart")}, {:class => 'plus'} %>
+                  <% end %>
+                  <%=g.d d[:id] %>         
+                  <%=g.d d[:systype] %>
+                  <%=g.d d[:name] %>
+                  <%=g.d d[:created_at].strftime("%Y-%m-%d") %>
+                  <%=g.d time_grans[d[:time_gran]] %>
+                  <%=g.d area_grans[d[:area_gran]] %>
+               <% end %>
+            <% end %>
+          <%else%>
+            <td colspan="<%= 2+cols.size %>">当前没有数据。</td>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

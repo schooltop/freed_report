@@ -3,7 +3,7 @@
 
 <div id="shortcuts" class="leftList">
     <div id='unittree' height=100% class='clsTreeDiv'>
-    <%#site_tab%>
+    <%sys_tab%>
     <%i=0%>
     <%site_menu.each do |m|%>
     <%i=i+1%>
@@ -16,13 +16,10 @@
        <ul id="ul_shortcuts<%=i%>"  style="display: block;">
          <ol class="ui-menu-content ui-helper-reset ui-widget-content ui-corner-bottom" style="padding: .4em .2em;font-size:1.2em;">
                   <%m.childmenus.each do |n|%>
-                      <%=site_title_select "#{n.name}","#{n.url}","#{n.url.to_s.delete('/')}"%>
+                      <%=sys_title_select "#{n.name}","#{n.url}","#{n.url.to_s.delete('/')}"%>
                   <%end%>
-         </ol>
+          </ol>
        </ul>
       <%end%>
     </div>
   </div>
-
-
-

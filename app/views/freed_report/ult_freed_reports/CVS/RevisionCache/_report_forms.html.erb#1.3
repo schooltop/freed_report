@@ -1,0 +1,77 @@
+<%#require "rubygems"%>
+<%#require "calendar_date_select"%>
+<%#=javascript_include_tag  'prototype' %>
+<%# CalendarDateSelect.format = :iso_date%>
+<%#= calendar_date_select_includes :locale=>'zh' %>
+
+<script type="text/javascript">
+
+  function check_date(n,h){
+    if(h=="1"){
+    $('#date_time'+n).datepicker({duration: '',
+        showTime: true,
+        constrainInput: false,
+        stepMinutes:60,
+        stepHours: 1,
+        altTimeField: '',
+        time24h: true,
+        howStatus: true});
+    }else{
+    $('#date_time'+n).datepicker({showButtonPanel: true,selectState:false,changeMonth:true,changeYear:true,hideReset:false});
+    }
+  };
+</script>
+
+<% form_for :ult_freed_report,@ult_freed_report,:url =>{:controller=>'freed_report/ult_freed_reports'}, :html=>{:class => "form ui-widget", :method=>:get} do |f| %>
+    <%= ui_error(f.error_messages) unless f.error_messages.empty? %>
+    <%= hidden_field_tag :redirect_to, params[:redirect_to] %>
+    <%= hidden_field_tag :report_id, params[:report_id] %>
+    <%= hidden_field_tag :remark, "remark" %>
+    <% field_set_tag "检索条件", :style => "font-size:12px;padding: 1em;background:transparent;", :class => "ui-widget-content ui-corner-all" do %>
+    <%#=button_to_function "高级搜索",onclick="jQuery('#mark_targ').toggle()" if @current_model.form_title&&@current_model.form_title!=""%>
+    <%#=link_button_to "检索配置", {:controller=>"ult_report_models",:action=>"mark_targs",:id=>@current_model.id}%>
+<div class="wrap">
+        <%if @current_model.time_gran&&@current_model.time_gran!=""&& @current_model.area_gran&&@current_model.area_gran!=""%>
+          <%@times={"hour"=>"小时","day"=>"天","week"=>"周","month"=>"月","all"=>"全部"}%>
+          <%@areas={"ap"=>"AP","ac"=>"AC","sw"=>"交换机","town"=>"郊县","city"=>"地市","province"=>"省份","port"=>"热点"}%>
+          <%@tab_models=FreedReport::UltReportModel.find(:all,:conditions => ["name = ? ",@current_model.name])%>
+          <%@area_grans=[]%> <%@time_grans=[]%>
+          <%for tab_model in @tab_models%>
+             <%area=["#{@areas[tab_model.area_gran]}","#{tab_model.area_gran}"]%>
+             <%@area_grans<<area unless @area_grans.include? area%>
+             <%time=["#{@times[tab_model.time_gran]}","#{tab_model.time_gran}"]%>
+             <%@time_grans<<time unless @time_grans.include? time%>
+          <%end%>
+        <div class="li">
+            <div class="col left">
+               <%=f.label :kpi, "区域粒度", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%=select( "area_gran","",@area_grans,{:selected=>@current_model.area_gran},:style => "width:262px;")%>
+            </div>
+            <div class="col right">
+               <%=f.label :time_gran, "时间粒度", :class => "label",:required => true ,:style=>"width:90px;"%>
+               <%=select( "time_gran","",@time_grans,{:selected=>@current_model.time_gran},:style => "width:262px;")%>
+            </div>
+       </div>
+        <%end%>
+           <div id="mark_targ">
+        <%@my_params.each_with_index do |a , x|%>
+             <%if (x+1)%2!=0%>
+                <div class="li">
+                  <div class="col left">
+                    <%=mark_unit(a,x)%>
+                  </div>
+                <%if (@my_params.size)%2!=0&&x==@my_params.size%></div><%end%>
+             <%else%>
+                  <div class="col right">
+                    <%=mark_unit(a,x)%>
+                  </div>
+              </div>
+             <%end%>
+        <%end%>
+           </div>
+      </div>
+   <div class="actions devices_control" style="float:right">
+      <%=f.submit "确定", :onclick => "return checktime()"  %>
+   </div>
+    <% end %>
+  <%end%>

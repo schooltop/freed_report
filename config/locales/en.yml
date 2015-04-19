@@ -3,12 +3,3 @@
 
 en:
   hello: "Hello world"
-
-  human_names:
-    ap:
-      ap_fit:
-        "1": "瘦"
-        "2": "胖"
-      ap_state:
-        "0": "正常"
-        "1": "采集中"

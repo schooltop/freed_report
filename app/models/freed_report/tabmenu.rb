@@ -20,4 +20,8 @@
      parent_menu ? parentname=parent_menu.name : parentname="导航栏"
      return parentname
    end
+   def self.wlanmenuitems
+     current_menuitems=FreedReport::Tabmenu.find(:all,:conditions=>"parent_id = id and top_style<>1 and modelname='SQL报表' ",:order=>"id desc")
+     return current_menuitems
+   end
   end

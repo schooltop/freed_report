@@ -1,0 +1,10 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%=I18n.locale%>" lang="<%=I18n.locale%>">
+  <%=render :partial=>'layouts/head'%>
+  <body class="<%=controller.controller_name%>" onload="document.getElementById('login').focus()">
+    <div id="wrapper">
+      <%=yield%>
+    </div>
+  </body>
+</html>

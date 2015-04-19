@@ -1,0 +1,133 @@
+<%content_for :head do %>
+
+  <%= stylesheet_link_tag "ui/ui/ui.datepicker.css" %>
+  <%= javascript_include_tag "ui/ui/i18n/ui.datepicker-zh-CN.js" %>
+  <%= javascript_include_tag "ui/ui/ui.datepicker.js" %>
+  <%= stylesheet_link_tag "ui/ui/ui.slider.css" %>
+  <%= javascript_include_tag "ui/ui/ui.slider.js"%>
+  <%= javascript_include_tag "timepicker.js"%>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <style type="text/css">
+    .ui-grid-scrollable TABLE{
+      width:100%;
+    }
+  </style>
+<%end%>
+
+<body>
+
+  <%content_for :header_title do %>
+  <%=@freed_report_name%>
+  <%end %>
+ <%#---------搜索框--------------%>
+ <%=render :partial=>"report_forms" if  @current_model.form_title&&@current_model.form_title!=""%>
+
+<br/>
+
+<%#---------图表展示--------------%>
+<%@model_charts=@current_model.ultra_company_charts%>
+<%if @model_charts&&@model_charts.size>2%>
+<div id="current_chart_tab">
+  <%=javascript_include_tag  'prototype' %>
+  <script>
+     function check_work(n){
+      jQuery(".report_charts").css('color',"#000000");
+      document.getElementById(n).style.color="#f59b45";
+      new Ajax.Updater('checkwork', '/freed_report/ultra_company_charts/check_report_chart?ultra_company_chart_id='+n, {asynchronous:true, evalScripts:true});}
+  </script>
+  <%for chart in @model_charts%>
+     <%if params[:ultra_company_chart_id]&&params[:ultra_company_chart_id]==chart.id.to_s%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%elsif !params[:ultra_company_chart_id]&&chart==@charts[0]%>
+       <input id="<%=chart.id%>" style="color:#f59b45;" name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>">
+     <%else%>
+       <input id="<%=chart.id%>"name="report_charts" class="report_charts" onclick="check_work('<%=chart.id%>')" type="button" value="<%=chart.name%>"  style="color:#000000;" >
+     <%end%>
+  <%end%>
+  <div id="checkwork"><%=render :partial => 'freed_report_chart_partial'%></div>
+</div>
+<%elsif @model_charts&&@model_charts.size==2%>
+<div id="current_chart_left">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<div id="current_chart_right">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<%elsif @model_charts&&@model_charts.size==1%>
+<div id="current_chart">
+  <%=render :partial => 'freed_report_chart_partial'%>
+</div>
+<%end%>
+
+<%#------------报表展示-------------------------%>
+<div id="device_grid">
+ <%  @grid.column_names.size > 10 ? scrollable =true : scrollable =false
+  ui_grid_for @grid,:scrollable =>scrollable do |g,cols,data|
+ %>
+  <%@columns=@columns-@hidden_columns-['RN']%>
+  <%sort_url = params.merge({:page => nil})%>
+  <div style="float:right;margin-right:10px "><%= export_to 'csv', "CSV", params %></div>
+      <% g.head do %>
+            <% g.r do %>
+              <%for item in @columns%>
+                  <%= g.format_sort(item,item, :html => {:width => "125px"}, :url =>sort_url) %>
+              <%end%>
+            <% end %>
+      <% end %>
+
+      <% g.body do %>
+        <% if data.size >0 %>
+           <% data.each do |d| %>
+                <% g.r do %>
+                  <%for item in @columns%>
+                    <%if item.include?("数") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_i)%>
+                     <%elsif item.include?("率") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].nil? ? "": d[item].to_f)%>
+                     <%elsif item.include?("占比") %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].nil? ? "": d[item].to_f)%>
+                     <%elsif item.include?("时间") %>
+                      <%if @current_model.time_gran&&@current_model.time_gran=="month"%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m') )%>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="week" %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m %W') )%>
+                      <%elsif @current_model.time_gran&&@current_model.time_gran=="hour" %>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m-%d %H') )%>
+                      <%else%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item].to_s.to_date.strftime('%Y-%m-%d'))%>
+                      <%end%>
+                     <%else%>
+                      <%=check_whether_link(g,d,@my_links[item],d[item])%>
+                     <%end%>
+                  <%end%>
+                <% end %>
+            <% end %>
+        <% else %>
+            <td colspan="<%= 2+cols.size %>">
+              当前没有数据。
+            </td>
+        <% end %>
+      <% end %>
+<% end %>
+
+  <% if !@page_ult_freed_reports.nil? && @page_ult_freed_reports.length > 0 %>
+    <div style="margin-top:0.5em;" class="clearfix">
+      <div class="left f4">显示<%=@ult_freed_reports.total_entries %>个结果中的<%=@ult_freed_reports.current_page == @ult_freed_reports.page_count ? (@ult_freed_reports.total_entries - @ult_freed_reports.per_page * (@ult_freed_reports.page_count - 1)): @ult_freed_reports.per_page %>个</div>
+      <%=will_paginate @ult_freed_reports %>
+    </div>
+  <% end %>
+
+
+</div>
+</body>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $("div.event-statistics-grid2 table tr").mouseover(function(){
+    $(this).css("background-color","#f1f2f4");
+  });
+  $("div.event-statistics-grid2 table tr").mouseout(function(){
+    $(this).css("background-color","#ffffff");
+  });
+});
+</script>

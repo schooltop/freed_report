@@ -1,0 +1,5 @@
+  <%require "freed_report/fusioncharts_helper"%>
+  <%=javascript_include_tag "FusionCharts.js"%>
+  <%if @ultra_company_chart%>
+      <%freed_report_chart(@ultra_company_chart.action_title,1116)%>
+  <%end%>

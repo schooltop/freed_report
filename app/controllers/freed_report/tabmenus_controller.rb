@@ -1,9 +1,11 @@
 class  FreedReport::TabmenusController < ApplicationController   #前置报表模版配置功能--2013-12-31版--李江锋ljf
   menu_item "freed_report"
-  sidebar "freed_report"
+  sidebar "ultra"
+  submenu_item "alarm_match"
 
   def index
-    @tabmenu = FreedReport::Tabmenu.find_by_sql("select * from ultra_company_tabmenus where 1=1 order by parent_id desc , id")
+    submenu_item "alarm_match"
+    @tabmenu = FreedReport::Tabmenu.find_by_sql("select * from ultra_company_tabmenus where (modelname='SQL报表' or modelname='手动报表' ) order by parent_id desc , id")
     @grid = UI::Grid.new(FreedReport::Tabmenu, @tabmenu)
     respond_to do |format|
       format.html # index.html.erb
@@ -12,6 +14,7 @@ class  FreedReport::TabmenusController < ApplicationController   #前置报表�
   end
 
   def new
+    submenu_item "alarm_match"
     @tabmenu = FreedReport::Tabmenu.new
     respond_to do |format|
       format.html #new.html.erb
@@ -22,6 +25,7 @@ class  FreedReport::TabmenusController < ApplicationController   #前置报表�
    def create
      @tabmenu = FreedReport::Tabmenu.new(params[:tabmenu].except(:ultra_company_tabmenus_users))
      @tabmenu.user_id=current_user.id
+     @tabmenu.modelname="SQL报表"
      @tabmenu.top_style=0
      if @tabmenu.save
        if params[:tabmenu][:ultra_company_tabmenus_users]
@@ -32,11 +36,10 @@ class  FreedReport::TabmenusController < ApplicationController   #前置报表�
            tab_user.save
        end
        end
-       if !params[:tabmenu][:modelname]||params[:tabmenu][:modelname]==""
-        @tabmenu.modelname=@tabmenu.name
-        @tabmenu.parent_id=nil
+       if !params[:tabmenu][:parent_id]||params[:tabmenu][:parent_id]==""
+        @tabmenu.parent_id=@tabmenu.id
        else
-          @tabmenu.parent_id=@tabmenu.id if !params[:tabmenu][:parent_id]||params[:tabmenu][:parent_id]==""
+          @tabmenu.parent_id=params[:tabmenu][:parent_id]
        end
        @tabmenu.save
         flash[:notice] ="导航配置配置创建成功"
@@ -58,12 +61,6 @@ class  FreedReport::TabmenusController < ApplicationController   #前置报表�
 
   def update
       @tabmenu = FreedReport::Tabmenu.find(params[:id])
-       if !@tabmenu.parent_id||@tabmenu.parent_id==""
-         @tabmenus = FreedReport::Tabmenu.find(:all,:conditions=>"modelname='#{@tabmenu.modelname}'")
-         @tabmenus.each do |p|
-           p.update_attributes(:modelname=>params[:tabmenu][:name])
-         end
-      end
       @tabmenu.update_attributes(params[:tabmenu].except(:ultra_company_tabmenus_users))
       sql=External.connection()
       sql.delete "delete from ultra_company_tabmenus_users where ultra_company_tabmenu_id=#{@tabmenu.id}"
@@ -75,14 +72,10 @@ class  FreedReport::TabmenusController < ApplicationController   #前置报表�
            tab_user.save
        end
       end
-       if !params[:tabmenu][:modelname]||params[:tabmenu][:modelname]==""
-        @tabmenu.modelname=params[:tabmenu][:name]
-        @tabmenu.parent_id=nil
+       if !params[:tabmenu][:parent_id]||params[:tabmenu][:parent_id]==""
+          @tabmenu.parent_id=@tabmenu.id
        else
-           if !params[:tabmenu][:parent_id]||params[:tabmenu][:parent_id]==""
-             @tabmenu.parent_id=@tabmenu.id unless params[:tabmenu][:modelname]==params[:tabmenu][:name]
-             @tabmenu.modelname=params[:tabmenu][:name]
-           end
+          @tabmenu.parent_id=params[:tabmenu][:parent_id]
        end
        @tabmenu.save
       flash[:notice] ="导航菜单修改成功"

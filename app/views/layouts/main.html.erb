@@ -1,0 +1,26 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%=I18n.locale%>" lang="<%=I18n.locale%>">
+  <%=render :partial=>'layouts/head'%>
+  <body  class="<%=controller.controller_name%>-<%=controller.action_name%>">
+    <div id="wrapper"  class="ui-layout" >
+      <%=render :partial=>'layouts/header'%>
+	  <% sidebar ||= render :partial=>(File.join controller.sidebar,'sidebar') if partial_exist?(controller.sidebar, 'sidebar') %>
+      <div id="content" class="clearfix <%='has-sidebar' unless sidebar.nil? %> <%=cookies[:_sidebar_mini]%>" >
+        <% unless sidebar.nil? %>
+          <%=sidebar%>
+        <% end %>
+        <div id="widebar" style="border:1px solid #ff0000; background: #ff0000">
+          <%#=render :partial=>'screen_meta'%>
+          <div id="widebar-inner">
+            <%=yield%>
+          </div><!-- widebar-inner -->
+        </div>
+      </div>
+      <div id="footer">
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%=I18n.locale%>" lang="<%=I18n.locale%>">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title><%= yield :title %></title>
+  <%=javascript_include_tag 'ui/jquery' %>
+  <%=javascript_include_tag 'ui/ui/effects.core' %>
+  <%=javascript_include_tag 'ui/ui/ui.core' %>
+  <%=javascript_include_tag 'ui/layout' %>
+ 
+  <%=stylesheet_link_tag 'ui/core',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/layout',:media=>'all' %>
+  <%=stylesheet_link_tag 'ui/ui/ui.core',:media=>'all' %> 
+  <%=stylesheet_link_tag 'themes/base/ui.theme',:media=>'all'  %>
+ 
+  <%=stylesheet_link_tag 'ui/widget/widget.grid',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.grid' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.menu',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.menu' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.switchpanel',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.switchpanel' %>
+  <%=stylesheet_link_tag 'ui/widget/widget.pagination',:media=>'all' %>
+  <%=javascript_include_tag 'ui/widget/widget.pagination' %> 
+  <%=stylesheet_link_tag 'webport', :media=>'all' %>
+
+  <body class="<%=controller.controller_name%>-<%=controller.action_name%>">
+    <div id="wrapper"  class="ui-layout">
+      <div id="content" class="clearfix">
+        <div id="widebar">
+          <div id="widebar-inner">
+            <%=yield%>
+          </div><!-- widebar-inner -->
+        </div>
+      </div>
+      <div id="footer">
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+<% content_for :header_title do %>系统错误<% end %>
+  <table align="center">
+    <tr>
+      <td>
+        <%=image_tag "/images/error.gif"%>
+      </td>
+      <td>
+        <%=message%>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="right">
+        <%=link_to "点击返回", url_for(:back)%>
+      </td>
+    </tr>
+  </table>

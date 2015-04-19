@@ -5,7 +5,26 @@ module OtherMod
   SiteTabs.each { |m| define_method("#{m}_tab") {session["#{m}_tab".to_sym] = request.request_uri.delete("/")} }
  
   def site_menu
-    @tabmenus=FreedReport::Tabmenu.find(:all,:conditions=>"modelname='#{session[:sys_tab]}' and parent_id = id and top_style<>1",:order=>"id")
+    @tabmenus=FreedReport::Tabmenu.find(:all,:conditions=>"(modelname='SQL报表' or modelname='手动报表' ) and parent_id = id and top_style<>1",:order=>"id")
+    #@tabmenus=Ultra::Tabmenu.find(:all,:conditions=>"modelname='#{controller.menu_item}' and parent_id is null",:order=>"id")
+  end
+
+  def to_chart_hash(str)
+     #属性转hash格式加载--2014-4-28--lij李江锋
+     str.split(",").map{|a| a.split("=>")}.inject({}){|h,a| h[a[0].gsub(":",'')] = a[1].gsub('\'','');h}
+  end
+
+  def check_whether_link(g,d,item_link,notice)
+    #前置报表是否钻取判断；params+本行data参数打包
+    if item_link
+      if item_link&&item_link[0..11]==":report_id=>"
+       g.d link_to notice,{:controller=>"freed_report/ult_freed_reports",:action=>"index",:report_id=>item_link[12..-1].to_i}.merge({:my_params=>@params_url}){ |key, v1, v2| v1 }.merge({:my_values=>d}),:target=>"_blank"
+      else
+       g.d link_to notice,to_chart_hash(item_link).merge({:my_params=>@params_url}).merge({:my_values=>d}),:target=>"_blank"
+      end
+    else
+       g.d notice
+    end
   end
 
    

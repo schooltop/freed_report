@@ -1,0 +1,44 @@
+require "builder"
+require "fusioncharts_helper"
+xml = Builder::XmlMarkup.new
+xml.chart(to_chart_hash(@column.chart_attributes))do
+  xml.categories do
+    for item in @user_analyses
+      xml.category(:name=>item["#{@column.chart_row}"])
+    end
+  end
+  if @column.chart_x
+    if @column.chart_x
+       for column in @column.chart_x.split(",")
+         for item in @user_analyses
+          #if("normalnum")
+            #xml.set(:name=>item[0] , :value=>item[1],:color=>''+get_fc_color,:link=>"log_analysis_normals")
+          #else
+            xml.set(:name=>column , :value=>item[column],:color=>''+get_fc_color)
+          #end
+          end
+      end
+    else
+      for column in @column.chart_x.split(",")
+        colunm_color=get_fc_color
+           xml.dataset(:seriesName=>column) do
+              for item in @user_analyses
+                xml.set(:value=>item[column],:color=>''+colunm_color)
+              end
+            end
+      end
+    end
+  end
+
+  if @column.chart_xs
+    for column in @column.chart_xs.split(",")
+      colunm_color=get_fc_color
+         xml.dataset(:seriesName=>column,:parentYAxis=>"S") do
+            for item in @user_analyses
+              xml.set(:value=>item[column],:color=>''+colunm_color)
+            end
+          end
+    end
+  end
+
+end

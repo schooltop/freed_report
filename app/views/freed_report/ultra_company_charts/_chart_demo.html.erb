@@ -1,0 +1,9 @@
+<%if @chart_id=="1"%>
+堆叠图样例：<br/><a href="images/image-0.jpg" class="lightbox" title="Photo by Warren Krewenki"><%=image_tag("/stylesheets/themes/ultrapower/images2/ddt.jpg",:style=>"width:380px;heigth:380px;")%></a>
+<%elsif @chart_id=="2"%>
+柱状图样例：<br/><a href="images/image-0.jpg" class="lightbox" title="Photo by Warren Krewenki"><%=image_tag("/stylesheets/themes/ultrapower/images2/zt.jpg",:style=>"width:380px;heigth:380px;")%></a>
+<%elsif @chart_id=="3"%>
+拆线图样例：<br/><a href="images/image-0.jpg" class="lightbox" title="Photo by Warren Krewenki"><%=image_tag("/stylesheets/themes/ultrapower/images2/cxt.jpg",:style=>"width:380px;heigth:380px;")%></a>
+<%elsif @chart_id=="4"%>
+饼状图样例：<br/><a href="#" onclick="helpshow()"><%=image_tag("/stylesheets/themes/ultrapower/images2/bt.jpg",:style=>"width:380px;heigth:380px;")%></a>
+<%end%>

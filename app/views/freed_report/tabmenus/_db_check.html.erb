@@ -1,11 +1,7 @@
      <div class="li">
              <div class="col left">
                <label class="label label" for="tabmenu_time_gran"><em>*</em>所属导航：</label>
-                  <%=@f.select :modelname, FreedReport::Tabmenu.menuitems.collect{|p|[p.name,p.modelname]},{:include_blank => "新建导航"}%>
-             </div>
-             <div class="col right">
-                <label class="label label" for="tabmenu_time_gran"><em>*</em>菜单父节点：</label>
-                  <%=@f.select :parent_id, FreedReport::Tabmenu.parent_menus.collect{|p|[p.name,p.id.to_s]},{:include_blank => "置顶节点"}%>
+                  <%=@f.select :parent_id, FreedReport::Tabmenu.wlanmenuitems.collect{|p|[p.name,p.id.to_s]},{:include_blank => "新建导航"}%>
              </div>
      </div>
      <div class="li">
@@ -20,18 +16,16 @@
      </div>
 
      <div class="li">
+                  <label class="label label" for="tabmenu_time_gran"><em>*</em>备注：</label>
+                  <%= @f.text_area :remark,:rows =>"140px", :cols =>"60px",:onclick=>"helphide()",:style=>"margin: 0px; height: 223px; width: 590px;" %>
+     </div>
+
+     <div class="li">
                   <label class="label label" for="tabmenu_time_gran"><em>*</em>权限设置：</label>
                   <% field_set_tag '模板用户<a  style="cursor: hand;"  class="cancelusers">(不选择用户)</a>', :style => "padding: 5px;", :class => "ui-widget-content ui-corner-all" do %>
                      <%=@f.select :ultra_company_tabmenus_users, User.all.map{|user| [user.name, user.id]}, {:selected => @tabmenu.ultra_company_tabmenus_users.collect{|user|user.user_id}},  {:multiple => true, :style => "height:261px;width:95%;margin-left:2.5%;border:none;"}%>
                   <%end%>
      </div>
-
-     <div class="li">
-                  <label class="label label" for="tabmenu_time_gran"><em>*</em>备注：</label>
-                  <%= @f.text_area :remark,:rows =>"140px", :cols =>"60px",:onclick=>"helphide()",:style=>"margin: 0px; height: 108px; width: 598px;" %>
-     </div>
-
-     
 
      
 

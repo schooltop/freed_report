@@ -1,0 +1,87 @@
+<% content_for :head do %>
+  <%=javascript_include_tag 'ui/external/form/jquery.form' %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.cluetip' %>
+  <%=javascript_include_tag 'ui/external/cluetip/jquery.hoverIntent.js' %>
+  <%=javascript_include_tag 'ui/ui/jquery.dropPanel'%>
+  <%=javascript_include_tag "ui/external/dynatree/jquery.dynatree.js"%>
+  <%=stylesheet_link_tag 'ui/ui/jquery.dropPanel'%>
+  <%=stylesheet_link_tag '/javascripts/ui/external/cluetip/jquery.cluetip.css',:media=>'all' %>
+  <%=stylesheet_link_tag "/javascripts/ui/external/dynatree/skin/ui.dynatree.css"%>
+  <%params[:tree_selection] ||= "2"%>
+  <style type="text/css">
+    div.ui-dynatree-container{
+      overflow:auto;
+      height: 200px;
+    }
+    .panelContent{
+      width: 200px;
+      height: 210px;
+    }
+    .dropPanel {
+      background:url("/images/multi_selection/dropdown.gif") no-repeat scroll right center #FFFFFF;
+      border:1px solid #7B9EBD;
+      cursor:default;
+      display:inline;
+      margin-top:3px;
+      padding:1px 20px 3px 3px;
+      position:relative;
+    }
+  </style>
+  <script type="text/javascript">
+    $(function(){
+      var config = {
+        replaceText: "加载中...",
+        onShow: function(dropPanel){
+          $("#dropContent").dynatree({
+            checkbox: true,
+            selectMode: "<%=params[:tree_selection]%>",
+            imagePath: '',
+            initAjax:{
+              data:{
+                domain_dns: $('#domain_dns').val(),
+                expand_level : <%=@user_level.to_i+2%>
+              },
+              url:"/area_selection/domains.json"
+            },
+            onActivate: function(dtnode) {
+            },
+            onLazyRead: function(dtnode){
+              dtnode.appendAjax({
+                url:"/area_selection/domains.json",
+                data:{
+                  key: dtnode.data.key,
+                  domain_dns: $('#domain_dns').val()
+                }
+              });
+            },
+            onSelect: function(select, dtnode) {
+              var selkeys = [];
+              var selTitles = [];
+              var selvals = $.map(dtnode.tree.getSelectedNodes(), function(node){
+                selkeys.push(node.data.key);
+                selTitles.push(node.data.title);
+                return node.data.level_desc + '=' + node.data.id;
+              });
+              $("#domains").val(selvals.join(" or "));
+              $("#domain_dns").val(selkeys.join("|"));
+              $("input[name='areas']").val(selTitles.join(","));
+            },
+            strings: {
+              loading: "加载中…",
+              loadError: "加载错误!"
+            },
+            onKeydown: function(dtnode, event) {
+              if( event.which == 32 ) {
+                dtnode.toggleSelect();
+                return false;
+              }
+            },
+            cookieId: "ui-dynatree-Cb2",
+            idPrefix: "ui-dynatree-Cb2-"
+          });
+        }
+      }
+      $("#areas_name").dropPanel(config);
+    });
+  </script>
+<% end %>
